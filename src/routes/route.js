@@ -62,11 +62,27 @@ function handleRoute() {
  * Attaches a submit handler to the register form to navigate to the board.
  */
 function initHome() {
+  // If a login form is present, initialize the login logic from src/js/Login.js
+  const loginForm = document.getElementById('loginForm');
+  if (loginForm) {
+    import('../js/Login.js').then(mod => {
+      try { mod.initLogin(); } catch (e) { console.error('initLogin error', e); }
+    }).catch(err => console.error('Could not load Login module', err));
+
+    // Wire the 'Registrarse' button to route to the signup view
+    const goSignup = document.getElementById('goSignupBtn');
+    if (goSignup) {
+      goSignup.addEventListener('click', () => { location.hash = '#/signup'; });
+    }
+
+    return; // login form handled
+  }
+
+  // Backwards compatibility: if the old minimal register/login form is present, keep previous behavior
   const form = document.getElementById('registerForm');
   const userInput = document.getElementById('username');
   const passInput = document.getElementById('password');
   const msg = document.getElementById('registerMsg');
-
   if (!form) return;
 
   form.addEventListener('submit', async (e) => {
@@ -84,9 +100,7 @@ function initHome() {
     form.querySelector('button[type="submit"]').disabled = true;
 
     try {
-      // Treat the simple home form as a login form: call auth/login
       const data = await loginUser({ email: username, password });
-      // save token if provided
       if (data?.token) localStorage.setItem('token', data.token);
       msg.textContent = 'Login exitoso';
       setTimeout(() => (location.hash = '#/board'), 400);
@@ -271,11 +285,17 @@ async function initBoard() {
         e.dataTransfer.setData('text/plain', li.dataset.id || '');
         li.setAttribute('aria-grabbed', 'true');
         setTimeout(() => li.style.opacity = '0.5', 0);
+        // mostrar zona de eliminar
+        const dz = document.getElementById('deleteZone');
+        if (dz) dz.style.display = 'block';
       };
       li.ondragend = e => {
         li.style.opacity = '';
         li.removeAttribute('aria-grabbed');
         delete li.dataset.draggingId;
+        // ocultar zona de eliminar
+        const dz = document.getElementById('deleteZone');
+        if (dz) dz.style.display = 'none';
       };
     });
 
@@ -320,6 +340,21 @@ async function initBoard() {
     }
   } catch (err) {
     todoList.innerHTML = progressList.innerHTML = doneList.innerHTML = `<li style="color:#ffb4b4">${err.message}</li>`;
+  }
+
+  // Avatar menu toggle (outside try/catch so it always binds when board view exists)
+  const avatarBtn = document.getElementById('avatarBtn');
+  const avatarMenu = document.getElementById('avatarMenu');
+  if (avatarBtn && avatarMenu) {
+    avatarBtn.onclick = (e) => {
+      e.stopPropagation();
+      avatarMenu.classList.toggle('show');
+      avatarMenu.setAttribute('aria-hidden', avatarMenu.classList.contains('show') ? 'false' : 'true');
+    };
+    // cerrar al click fuera
+    document.addEventListener('click', () => {
+      if (avatarMenu.classList.contains('show')) avatarMenu.classList.remove('show');
+    });
   }
 }
 
