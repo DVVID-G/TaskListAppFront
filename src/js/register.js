@@ -3,6 +3,8 @@
 export function initRegister() {
   const form = document.getElementById("registerForm");
   const btn = document.getElementById("registerBtn");
+  const btnText = document.getElementById('btnText');
+  const spinner = document.getElementById('spinner');
 
   const firstName = document.getElementById("firstName");
   const lastName = document.getElementById("lastName");
@@ -64,10 +66,31 @@ export function initRegister() {
     input.addEventListener("input", validate)
   );
 
+  // Toggle password visibility for register form
+  const togglePasswordReg = document.getElementById('togglePasswordReg');
+  const toggleConfirmReg = document.getElementById('toggleConfirmReg');
+  if (togglePasswordReg) {
+    togglePasswordReg.addEventListener('click', () => {
+      const showing = togglePasswordReg.getAttribute('aria-pressed') === 'true';
+      password.type = showing ? 'password' : 'text';
+      togglePasswordReg.textContent = showing ? 'Mostrar' : 'Ocultar';
+      togglePasswordReg.setAttribute('aria-pressed', showing ? 'false' : 'true');
+    });
+  }
+  if (toggleConfirmReg) {
+    toggleConfirmReg.addEventListener('click', () => {
+      const showing = toggleConfirmReg.getAttribute('aria-pressed') === 'true';
+      confirmPassword.type = showing ? 'password' : 'text';
+      toggleConfirmReg.textContent = showing ? 'Mostrar' : 'Ocultar';
+      toggleConfirmReg.setAttribute('aria-pressed', showing ? 'false' : 'true');
+    });
+  }
+
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
-    btn.disabled = true;
-    btn.textContent = "Procesando...";
+  btn.disabled = true;
+  if (btnText) btnText.textContent = 'Procesando...';
+  if (spinner) spinner.style.display = 'inline-block';
 
     const userData = {
       nombres: firstName.value.trim(),
@@ -86,23 +109,27 @@ export function initRegister() {
       });
 
       if (res.status === 201) {
-        btn.textContent = "Registrarse";
+        if (btnText) btnText.textContent = 'Registrarse';
+        if (spinner) spinner.style.display = 'none';
         alert("✅ Cuenta creada con éxito");
         setTimeout(() => (window.location.hash = "#/login"), 500);
       } else if (res.status === 409) {
         errors.emailError.textContent = "Este correo ya está registrado";
-        btn.textContent = "Registrarse";
+        if (btnText) btnText.textContent = 'Registrarse';
+        if (spinner) spinner.style.display = 'none';
         btn.disabled = false;
       } else {
         console.error(await res.text());
         alert("Intenta de nuevo más tarde");
-        btn.textContent = "Registrarse";
+        if (btnText) btnText.textContent = 'Registrarse';
+        if (spinner) spinner.style.display = 'none';
         btn.disabled = false;
       }
     } catch (err) {
       console.error(err);
       alert("Intenta de nuevo más tarde");
-      btn.textContent = "Registrarse";
+      if (btnText) btnText.textContent = 'Registrarse';
+      if (spinner) spinner.style.display = 'none';
       btn.disabled = false;
     }
   });
