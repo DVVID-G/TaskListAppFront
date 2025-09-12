@@ -7,7 +7,7 @@
 
 import './styles/base.css';
 import './styles/signup.css';
-import { initLogin } from './js/Login.js';
+import { initLogin } from './js/login.js';
 
 if (window.location.pathname.includes('login')) {
   initLogin();
