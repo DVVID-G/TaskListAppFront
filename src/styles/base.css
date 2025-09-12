@@ -12,13 +12,10 @@
 
 body {
     font-family: var(--font-family);
-    background-color: var(--background-color);
+    background: radial-gradient(ellipse at bottom, #5b0d6a 0%, #2b0b3a 40%, #0e0b14 100%);
     color: var(--text-color);
     margin: 0;
     padding: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
     min-height: 100vh;
 }
 
@@ -34,6 +31,149 @@ body {
     border-radius: 12px;
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.7);
 }
+
+/* Centered login page */
+.login-page {
+    min-height: calc(100vh - 80px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+}
+
+.login-card {
+    width: 100%;
+    max-width: 380px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.03));
+    border: 1px solid rgba(255,255,255,0.06);
+    backdrop-filter: blur(8px);
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 8px 30px rgba(2,6,23,0.6);
+    color: #fff;
+}
+
+.login-card h2 {
+    margin: 0 0 1rem 0;
+    font-size: 1.25rem;
+    text-align: center;
+}
+
+.login-card .row {
+    margin-bottom: 0.75rem;
+}
+
+.login-card label {
+    display: block;
+    font-size: 0.85rem;
+    margin-bottom: 0.25rem;
+    opacity: 0.9;
+}
+
+.login-card input[type="email"],
+.login-card input[type="password"],
+.login-card input[type="text"] {
+    width: 100%;
+    padding: 0.6rem 0.75rem;
+    border-radius: 8px;
+    border: 1px solid rgba(255,255,255,0.08);
+    background: rgba(255,255,255,0.03);
+    color: #fff;
+    outline: none;
+}
+
+.input-wrap { position: relative; }
+.input-wrap .toggle-pass {
+    position: absolute;
+    right: 6px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: transparent;
+    border: none;
+    color: var(--primary-color); /* highlighted color for toggle */
+    padding: 6px 8px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.85rem;
+}
+.input-wrap .toggle-pass:focus { box-shadow: 0 0 0 3px rgba(37,99,235,0.14); }
+
+.login-card input::placeholder { color: rgba(255,255,255,0.45); }
+.login-card input:focus {
+    border-color: rgba(37,99,235,0.9);
+    box-shadow: 0 6px 18px rgba(37,99,235,0.06), 0 0 0 4px rgba(37,99,235,0.06);
+}
+
+/* Ensure inputs inside input-wrap match the visual size of plain inputs */
+.input-wrap { width: 100%; position: relative; }
+.input-wrap input {
+    box-sizing: border-box;
+    width: 100%;
+    padding: 0.6rem 0.75rem;
+    padding-right: 3.6rem; /* space for toggle button */
+    border-radius: 8px;
+    border: 1px solid rgba(255,255,255,0.08);
+    background: rgba(255,255,255,0.03);
+    color: #fff;
+    font-size: 1rem;
+    line-height: 1.2;
+}
+
+/* Make toggle button visually small and not affect input height */
+.input-wrap .toggle-pass {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 2;
+    padding: 0 8px;
+    background: transparent;
+    border: none;
+    line-height: 1;
+    height: auto;
+    display: inline-flex;
+    align-items: center;
+    color: var(--primary-color);
+}
+
+/* Center labels and inputs horizontally inside login rows */
+.center-row { display:flex; flex-direction:column; align-items:center; }
+.center-row label { text-align:center; width:100%; }
+.center-row input { max-width: 320px; }
+/* Ensure the input wrapper itself is centered and constrained so the toggle aligns inside the field */
+.center-row .input-wrap { max-width: 320px; width: 100%; margin: 0 auto; }
+
+/* Forgot password link style */
+#forgotPassword { color: var(--primary-color); text-decoration: none; }
+#forgotPassword:hover { text-decoration: underline; color: var(--secondary-color); }
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.6rem 1rem;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    background: #2563eb;
+    color: #fff;
+    font-weight: 600;
+}
+
+.spinner {
+    width: 14px;
+    height: 14px;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-top-color: #fff;
+    border-radius: 50%;
+    display: inline-block;
+    animation: spin 0.8s linear infinite;
+}
+
+.error-msg { font-size: 0.8rem; color: #ffb4b4; min-height: 1rem; }
+
+@keyframes spin { to { transform: rotate(360deg); } }
 
 .toolbar {
     margin-bottom: 20px;
@@ -144,6 +284,43 @@ h1 {
         font-size: 0.95rem;
     }
 }
+
+/* Top app header */
+.app-header {
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding: 18px 36px;
+    gap:12px;
+}
+
+.app-left { display:flex; align-items:center; gap:16px; }
+.app-brand .logo { font-weight:700; font-size:1.2rem; color: #fff; }
+.app-brand .subtitle { font-size:0.85rem; color: rgba(255,255,255,0.85); }
+.new-task-btn { width:auto; padding:10px 18px; border-radius:20px; }
+
+.user-area { position:relative; }
+.avatar { width:44px; height:44px; border-radius:50%; cursor:pointer; border:2px solid rgba(255,255,255,0.08); }
+.avatar-menu { position:absolute; right:0; top:54px; background:#0f1720; color:#fff; border-radius:8px; box-shadow:0 8px 20px rgba(0,0,0,0.5); padding:8px; display:none; min-width:160px; }
+.avatar-menu ul { list-style:none; margin:0; padding:0; }
+.avatar-menu li { padding:8px 12px; }
+.avatar-menu li a { color:#ddd; text-decoration:none; }
+.avatar-menu li:hover { background: rgba(255,255,255,0.02); }
+.avatar-menu.show { display:block; }
+
+/* Kanban layout tweaks */
+.kanban-main { padding: 18px 36px; }
+.kanban-board { display:flex; gap:24px; align-items:flex-start; }
+.kanban-column { background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01)); padding:18px; border-radius:12px; min-height:420px; border:1px solid rgba(255,255,255,0.04); }
+.kanban-title { color:#fff; text-align:center; margin-bottom:14px; opacity:0.95; }
+
+.todo { background: linear-gradient(180deg,#ffffff 0%,#f7f7fb 100%); color:#111; padding:14px; border-radius:10px; margin-bottom:10px; }
+.meta { font-size:0.8rem; color:#666; margin-top:8px; display:flex; justify-content:space-between; align-items:center; }
+
+.delete-zone { position:fixed; left:50%; transform:translateX(-50%); bottom:28px; }
+.delete-btn { background:#ff4d4f; color:#fff; border:none; padding:12px 18px; border-radius:14px; box-shadow:0 8px 20px rgba(0,0,0,0.25); }
+
+@media (max-width: 900px) { .kanban-board { flex-direction:column; } }
 
 /* Kanban board styles */
 .kanban-container {
