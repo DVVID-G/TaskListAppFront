@@ -65,7 +65,7 @@ function initHome() {
   // If a login form is present, initialize the login logic from src/js/Login.js
   const loginForm = document.getElementById('loginForm');
   if (loginForm) {
-    import('./js/login.js').then(mod => {
+    import('../js/login.js').then(mod => {
       try { mod.initLogin(); } catch (e) { console.error('initLogin error', e); }
     }).catch(err => console.error('Could not load Login module', err));
 
