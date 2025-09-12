@@ -2,7 +2,13 @@ export function initLogin() {
   const form = document.getElementById("loginForm");
   if (!form) return;
 
-  const email = document.getElementById("email");
+  const http.js:25 
+ 
+ POST http://localhost:3000/api/v1/users 400 (Bad Request)
+request	@	http.js:25
+post	@	http.js:63
+registerUser	@	userService.js:26
+(anonymous)	@	route.js:82email = document.getElementById("email");
   const password = document.getElementById("password");
 
   const btn = document.getElementById("loginBtn");
@@ -62,6 +68,10 @@ export function initLogin() {
         // Guardar token si viene en la respuesta
         if (data.token) {
           localStorage.setItem('token', data.token);
+        }
+        // Guardar el ID del usuario si viene en la respuesta
+        if (data.user && data.user._id) {
+          localStorage.setItem('userId', data.user._id);
         }
         alert("✅ Login exitoso");
         setTimeout(() => (window.location.hash = "#/board"), 500);

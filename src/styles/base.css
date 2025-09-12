@@ -144,3 +144,127 @@ h1 {
         font-size: 0.95rem;
     }
 }
+
+/* Kanban board styles */
+.kanban-container {
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+}
+
+.kanban-header {
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:1rem;
+    margin-bottom:1rem;
+}
+
+.kanban-header h1 {
+    margin:0;
+    font-size:1.8rem;
+    color:var(--text-color);
+}
+
+/* App title */
+.app-title {
+    display:flex;
+    justify-content:center;
+    margin-bottom:0.6rem;
+}
+.app-name {
+    border:4px solid var(--primary-color);
+    padding:0.6rem 1.2rem;
+    font-weight:700;
+    color:var(--primary-color);
+    background:transparent;
+    letter-spacing:3px;
+}
+
+.kanban-board {
+    display:flex;
+    gap:1rem;
+    align-items:flex-start;
+}
+
+.kanban-column {
+    flex:1;
+    background: #f7f7fa;
+    border-radius:12px;
+    padding:0.8rem;
+    min-height:360px;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.4);
+}
+
+.kanban-title {
+    text-align:center;
+    color:#333;
+    margin:0 0 0.6rem 0;
+    font-size:1.05rem;
+}
+
+.kanban-list {
+    list-style:none;
+    padding:0.6rem;
+    margin:0;
+    min-height:240px;
+}
+
+.todo {
+    background:#ffffff;
+    color:#222;
+    padding:0.6rem 0.8rem;
+    border-radius:8px;
+    margin-bottom:0.6rem;
+    box-shadow:0 4px 10px rgba(0,0,0,0.08);
+    cursor:grab;
+}
+
+.todo strong {
+    display:block;
+    font-size:1rem;
+    margin-bottom:0.2rem;
+}
+
+.todo div {
+    font-size:0.9rem;
+}
+
+.todo .meta {
+    font-size:0.8rem;
+    color:#666;
+    margin-top:0.4rem;
+}
+
+/* Highlight drop target */
+.kanban-column.drag-over {
+    outline: 3px dashed rgba(26, 188, 156, 0.35);
+}
+
+/* Delete zone */
+.delete-zone {
+    position: fixed;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: 30px;
+    width: 60%;
+    max-width: 720px;
+    background: #c0392b;
+    color: white;
+    text-align: center;
+    font-weight: 700;
+    padding: 18px 12px;
+    border-radius: 8px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.5);
+    z-index: 9999;
+    font-size: 1.25rem;
+    letter-spacing: 2px;
+}
+.delete-zone.drag-over {
+    background: #e74c3c;
+    transform: translateX(-50%) scale(1.03);
+}
+
+@media (max-width: 800px) {
+    .kanban-board { flex-direction: column; }
+}
