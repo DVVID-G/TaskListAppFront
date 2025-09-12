@@ -1,0 +1,37 @@
+<div class="container">
+  <article class="card">
+    <header class="toolbar">
+      <a class="link" href="#/board">← Volver</a>
+    </header>
+    <h1>Crear tarea</h1>
+    <form id="createTaskForm" class="form" autocomplete="off">
+      <div class="row">
+        <label for="title">Título</label>
+        <input id="title" name="title" type="text" required minlength="2" placeholder="Ej: Terminar proyecto" />
+        <small class="error-msg" id="titleError"></small>
+      </div>
+      <div class="row">
+        <label for="description">Descripción</label>
+        <textarea id="description" name="description" required minlength="5" placeholder="Describe la tarea..."></textarea>
+        <small class="error-msg" id="descriptionError"></small>
+      </div>
+      <div class="row">
+        <label for="status">Estado</label>
+        <select id="status" name="status" required>
+          <option value="Por hacer">Por hacer</option>
+          <option value="En progreso">En progreso</option>
+          <option value="Completada">Completada</option>
+        </select>
+        <small class="error-msg" id="statusError"></small>
+      </div>
+      <!-- El ID de usuario se asigna automáticamente desde localStorage, no se muestra al usuario -->
+      <div class="row">
+        <button id="createTaskBtn" type="submit" class="btn">
+          <span id="btnText">Crear tarea</span>
+          <span id="spinner" class="spinner" style="display:none;"></span>
+        </button>
+      </div>
+      <p id="createTaskMsg"></p>
+    </form>
+  </article>
+</div>

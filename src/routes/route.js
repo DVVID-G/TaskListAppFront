@@ -24,6 +24,11 @@ async function loadView(name) {
   if (name === 'home') initHome();
   if (name === 'board') initBoard();
   if (name === 'signup') initSignup();
+  if (name === 'createTask') {
+    import('../js/createTask.js').then(module => {
+      module.initCreateTask();
+    });
+  }
 }
 
 /**
@@ -41,7 +46,7 @@ export function initRouter() {
  */
 function handleRoute() {
   const path = (location.hash.startsWith('#/') ? location.hash.slice(2) : '') || 'home';
-  const known = ['home', 'board', 'signup'];
+  const known = ['home', 'board', 'signup', 'createTask'];
   const route = known.includes(path) ? path : 'home';
 
   loadView(route).catch(err => {
@@ -97,42 +102,328 @@ function initHome() {
  * Initialize the "board" view.
  * Sets up the todo form, input, and list with create/remove/toggle logic.
  */
-function initBoard() {
-  const form = document.getElementById('todoForm');
-  const input = document.getElementById('newTodo');
-  const list = document.getElementById('todoList');
-  if (!form || !input || !list) return;
+async function initBoard() {
+  // Elementos de columnas Kanban
+  const todoList = document.getElementById('todoList-todo');
+  const progressList = document.getElementById('todoList-progress');
+  const doneList = document.getElementById('todoList-done');
+  if (!todoList || !progressList || !doneList) return;
 
-  // Add new todo item
-  form.addEventListener('submit', (e) => {
-    e.preventDefault();
-    const title = input.value.trim();
-    if (!title) return;
+  // Limpiar columnas
+  todoList.innerHTML = '';
+  progressList.innerHTML = '';
+  doneList.innerHTML = '';
 
-    const li = document.createElement('li');
-    li.className = 'todo';
-    li.innerHTML = `
-      <label>
-        <input type="checkbox" class="check">
-        <span>${title}</span>
-      </label>
-      <button class="link remove" type="button">Eliminar</button>
-    `;
-    list.prepend(li);
-    input.value = '';
-  });
+  // Obtener tareas del backend
+  const base = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+  const token = localStorage.getItem('token');
+  try {
+    const res = await fetch(`${base.replace(/\/$/, '')}/api/v1/tasks`, {
+      headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+    });
+    const data = await res.json();
+    console.log('GET /api/v1/tasks payload:', data);
+    if (!res.ok) throw new Error(data.message || data.error || 'Error al obtener tareas');
+    // Aceptar varias formas de payload: array directo, { data: [...] } o { tasks: [...] }
+    const tasks = Array.isArray(data) ? data : (Array.isArray(data.data) ? data.data : (Array.isArray(data.tasks) ? data.tasks : []));
+    console.log('Parsed tasks count:', tasks.length);
+    // Agrupar tareas por estado y hacerlas arrastrables
+    tasks.forEach(task => {
+      const li = document.createElement('li');
+      li.className = 'todo';
+      li.setAttribute('draggable', 'true');
 
-  // Handle remove and toggle completion
-  list.addEventListener('click', (e) => {
-    const li = e.target.closest('.todo');
-    if (!li) return;
-    if (e.target.matches('.remove')) li.remove();
-    if (e.target.matches('.check')) li.classList.toggle('completed', e.target.checked);
-  });
+      // Obtener el ID real desde las posibles propiedades y normalizarlo
+      let realId = '';
+      if (task && typeof task === 'object') {
+        realId = String(task._id || task.id || task._idTask || '');
+      }
+      // Quitar prefijos raros como ':id' o '/:id/' y espacios
+      realId = realId.replace(/[:\/]/g, '').trim();
+
+      li.dataset.id = realId;
+      // Mapear el status backend al texto mostrado en la UI
+      const uiStatus = mapStatusForUI(task.status || '');
+      li.dataset.status = uiStatus;
+      li.innerHTML = `
+        <div class="content">
+          <strong>${escapeHtml(task.title || '(sin título)')}</strong>
+          <div>${escapeHtml(task.description || '')}</div>
+        </div>
+        <div class="meta">${escapeHtml(uiStatus || '')}</div>
+      `;
+      if (uiStatus === 'Por hacer') todoList.appendChild(li);
+      else if (uiStatus === 'En progreso') progressList.appendChild(li);
+      else if (uiStatus === 'Completada') doneList.appendChild(li);
+    });
+
+    // Drag & drop listeners para columnas
+    [todoList, progressList, doneList].forEach(listEl => {
+      listEl.ondragover = e => { e.preventDefault(); listEl.closest('.kanban-column')?.classList.add('drag-over'); };
+      listEl.ondragleave = e => { listEl.closest('.kanban-column')?.classList.remove('drag-over'); };
+      listEl.ondrop = async e => {
+        e.preventDefault();
+        listEl.closest('.kanban-column')?.classList.remove('drag-over');
+        // Preferir dataset del elemento arrastrado si está presente
+        let taskId = e.dataTransfer.getData('text/plain') || '';
+        // Si el navegador no pasó el id, intentar leer del elemento objetivo
+        if (!taskId && e.target && e.target.closest) {
+          const dragged = document.querySelector('[data-dragging-id]');
+          taskId = dragged ? dragged.dataset.draggingId : '';
+        }
+        // Normalizar id: quitar prefijos y barras
+        taskId = String(taskId || '').replace(/[:\/]/g, '').trim();
+        const newStatus = listEl.closest('.kanban-column')?.getAttribute('data-status') || listEl.parentElement?.getAttribute('data-status');
+        // Mapear el status mostrado en la UI al valor que el backend espera
+        const mappedStatus = mapStatusForBackend(newStatus);
+        if (!taskId || !newStatus) {
+          alert('ID de tarea o estado destino no válido.');
+          return;
+        }
+        // Validar formato de ID (MongoDB: 24 hex)
+        if (!/^[a-fA-F0-9]{24}$/.test(taskId)) {
+          alert('ID de tarea inválido: ' + taskId);
+          return;
+        }
+        // Actualizar estado en backend (usar el valor mapeado para el backend)
+        try {
+          const patchUrl = `${base.replace(/\/$/, '')}/api/v1/tasks/${taskId}`;
+          console.log('PATCH ->', patchUrl, 'body=', { status: mappedStatus, original: newStatus }, 'tokenPresent=', !!token);
+          const patchRes = await fetch(patchUrl, {
+            method: 'PATCH',
+            headers: {
+              'Content-Type': 'application/json',
+              ...(token && { 'Authorization': `Bearer ${token}` })
+            },
+            body: JSON.stringify({ status: mappedStatus })
+          });
+          const patchBody = await patchRes.text().catch(() => '');
+          console.log('PATCH res', patchRes.status, patchBody);
+          if (patchRes.ok) {
+            // Recargar tablero
+            initBoard();
+            return;
+          }
+
+          // Si el servidor responde 404, intentar PUT como fallback (algunas APIs usan PUT)
+          if (patchRes.status === 404) {
+            console.warn('PATCH devolvió 404, intentando PUT de fallback');
+            const putUrl = patchUrl;
+            console.log('PUT ->', putUrl, 'body=', { status: mappedStatus, original: newStatus }, 'tokenPresent=', !!token);
+            const putRes = await fetch(putUrl, {
+              method: 'PUT',
+              headers: {
+                'Content-Type': 'application/json',
+                ...(token && { 'Authorization': `Bearer ${token}` })
+              },
+              body: JSON.stringify({ status: mappedStatus })
+            });
+            const putBody = await putRes.text().catch(() => '');
+            console.log('PUT res', putRes.status, putBody);
+            if (putRes.ok) {
+              initBoard();
+              return;
+            }
+
+              // Si PUT tampoco funciona, mostrar la respuesta del servidor para depuración
+              showServerDebug(patchRes.status, patchBody || putBody || 'Sin cuerpo de respuesta');
+              // Si la respuesta es un error de validación de enum, ofrecer mapa interactivo
+              if ((patchBody || putBody || '').includes('is not a valid enum value')) {
+                const suggested = await askForStatusMapping(newStatus);
+                if (suggested) {
+                  // reintentar la actualización usando el valor sugerido del backend
+                  const retryUrl = patchUrl;
+                  const retryRes = await fetch(retryUrl, {
+                    method: 'PATCH',
+                    headers: {
+                      'Content-Type': 'application/json',
+                      ...(token && { 'Authorization': `Bearer ${token}` })
+                    },
+                    body: JSON.stringify({ status: suggested })
+                  });
+                  const retryBody = await retryRes.text().catch(() => '');
+                  console.log('Retry PATCH res', retryRes.status, retryBody);
+                  if (retryRes.ok) {
+                    initBoard();
+                    return;
+                  }
+                  showServerDebug(retryRes.status, retryBody || 'Sin cuerpo de respuesta');
+                }
+              }
+              throw new Error(`Servidor no encontró la tarea (PATCH/PUT) - status ${patchRes.status}`);
+          }
+
+          // Otros errores: mostrar la respuesta
+          showServerDebug(patchRes.status, patchBody || 'Sin cuerpo de respuesta');
+          throw new Error((patchBody && patchBody) || 'No se pudo actualizar el estado');
+        } catch (err) {
+          alert(err.message);
+        }
+      };
+    });
+    // Drag start para tareas
+    // Marcar el elemento que se está arrastrando para fallback si el dataTransfer falla
+    document.querySelectorAll('.todo[draggable="true"]').forEach(li => {
+      li.ondragstart = e => {
+        // Guardar también el id en el elemento para usar como fallback
+        li.dataset.draggingId = li.dataset.id || '';
+        // además guardar el id limpio en dataTransfer y una marca visible para deleteZone
+        e.dataTransfer.setData('text/plain', li.dataset.id || '');
+        li.setAttribute('aria-grabbed', 'true');
+        setTimeout(() => li.style.opacity = '0.5', 0);
+      };
+      li.ondragend = e => {
+        li.style.opacity = '';
+        li.removeAttribute('aria-grabbed');
+        delete li.dataset.draggingId;
+      };
+    });
+
+    // Delete zone handlers
+    const deleteZone = document.getElementById('deleteZone');
+    if (deleteZone) {
+      deleteZone.ondragover = e => { e.preventDefault(); deleteZone.classList.add('drag-over'); };
+      deleteZone.ondragleave = e => { deleteZone.classList.remove('drag-over'); };
+      deleteZone.ondrop = async e => {
+        e.preventDefault();
+        deleteZone.classList.remove('drag-over');
+        let taskId = e.dataTransfer.getData('text/plain') || '';
+        if (!taskId) {
+          const dragged = document.querySelector('[data-dragging-id]');
+          taskId = dragged ? dragged.dataset.draggingId : '';
+        }
+        taskId = String(taskId || '').replace(/[:\/]/g, '').trim();
+        if (!/^[a-fA-F0-9]{24}$/.test(taskId)) {
+          alert('ID de tarea inválido para eliminar: ' + taskId);
+          return;
+        }
+        if (!confirm('¿Seguro que quieres eliminar esta tarea? Esta acción no se puede deshacer.')) return;
+        try {
+          const delUrl = `${base.replace(/\/$/, '')}/api/v1/tasks/${taskId}`;
+          const delRes = await fetch(delUrl, {
+            method: 'DELETE',
+            headers: {
+              ...(token && { 'Authorization': `Bearer ${token}` })
+            }
+          });
+          const delBody = await delRes.text().catch(() => '');
+          console.log('DELETE res', delRes.status, delBody);
+          if (!delRes.ok) {
+            showServerDebug(delRes.status, delBody || 'Sin cuerpo de respuesta');
+            throw new Error('No se pudo eliminar la tarea');
+          }
+          initBoard();
+        } catch (err) {
+          alert(err.message);
+        }
+      };
+    }
+  } catch (err) {
+    todoList.innerHTML = progressList.innerHTML = doneList.innerHTML = `<li style="color:#ffb4b4">${err.message}</li>`;
+  }
 }
 
 function initSignup () {
   import('../js/register.js').then(module => {
     module.initRegister();
   });
+}
+
+/**
+ * Mostrar en la interfaz una caja de depuración con la respuesta del servidor
+ * para facilitar lectura del HTML/error devuelto (temporal).
+ */
+function showServerDebug(status, body) {
+  // Buscar o crear contenedor
+  let dbg = document.getElementById('serverDebug');
+  if (!dbg) {
+    dbg = document.createElement('div');
+    dbg.id = 'serverDebug';
+    dbg.style.background = '#fff3f3';
+    dbg.style.border = '1px solid #ffb4b4';
+    dbg.style.padding = '1rem';
+    dbg.style.margin = '1rem';
+    dbg.style.whiteSpace = 'pre-wrap';
+    dbg.style.maxHeight = '240px';
+    dbg.style.overflow = 'auto';
+    // Insertarlo al inicio del app para que esté visible
+    const appEl = document.getElementById('app');
+    if (appEl) appEl.prepend(dbg);
+  }
+  dbg.innerHTML = `<strong>Server debug (status ${status}):</strong>\n${escapeHtml(body)}`;
+}
+
+function escapeHtml(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
+/**
+ * Prompt the user for the backend-expected enum value for a given displayed status.
+ * Persists a map in localStorage so the user doesn't need to repeat the mapping.
+ * Returns the mapped value (or null if user cancels).
+ */
+async function askForStatusMapping(displayStatus) {
+  const mapKey = 'statusMap_v1';
+  const raw = localStorage.getItem(mapKey);
+  const map = raw ? JSON.parse(raw) : {};
+  if (map[displayStatus]) return map[displayStatus];
+
+  const promptMsg = `El backend rechazó el valor '${displayStatus}' como enum.\nPor favor ingresa el valor exacto que el backend espera para este estado (ej: 'Por hacer', 'por_hacer', 'TODO', etc.).\nSi no sabes, escribe CANCEL para abortar.`;
+  const answer = prompt(promptMsg, displayStatus);
+  if (!answer || answer.toUpperCase() === 'CANCEL') return null;
+  map[displayStatus] = answer;
+  try { localStorage.setItem(mapKey, JSON.stringify(map)); } catch (e) { /* ignore */ }
+  return answer;
+}
+
+/**
+ * Map UI status text to the backend enum value.
+ * Defaults to known mapping based on your model: ['Por hacer','Haciendo','Hecho']
+ * Reads overrides from localStorage key 'statusMap_v1'.
+ */
+function mapStatusForBackend(uiStatus) {
+  if (!uiStatus) return uiStatus;
+  const defaults = {
+    'Por hacer': 'Por hacer',
+    'En progreso': 'Haciendo',
+    'Completada': 'Hecho'
+  };
+  try {
+    const raw = localStorage.getItem('statusMap_v1');
+    const map = raw ? JSON.parse(raw) : {};
+    if (map[uiStatus]) return map[uiStatus];
+  } catch (e) {
+    // ignore
+  }
+  return defaults[uiStatus] || uiStatus;
+}
+
+/**
+ * Map backend status to the UI label.
+ * Default mapping: 'Por hacer'->'Por hacer', 'Haciendo'->'En progreso', 'Hecho'->'Completada'
+ */
+function mapStatusForUI(backendStatus) {
+  if (!backendStatus) return backendStatus;
+  const defaults = {
+    'Por hacer': 'Por hacer',
+    'Haciendo': 'En progreso',
+    'Hecho': 'Completada'
+  };
+  try {
+    const raw = localStorage.getItem('statusMap_v1');
+    const map = raw ? JSON.parse(raw) : {};
+    // If user provided custom mapping as ui->backend, try to invert it
+    for (const [ui, backend] of Object.entries(map)) {
+      if (backend === backendStatus) return ui;
+    }
+  } catch (e) {
+    // ignore
+  }
+  return defaults[backendStatus] || backendStatus;
 }

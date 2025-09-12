@@ -1,16 +1,30 @@
-<div class="container">
-  <article class="card">
-    <header class="toolbar">
-      <a class="link" href="#/home">← Volver</a>
-    </header>
-    <h1>Mis tareas</h1>
-    <form id="todoForm" class="form" autocomplete="off">
-      <div class="row">
-        <label for="newTodo">Nueva tarea</label>
-        <input id="newTodo" name="title" type="text" placeholder="Comprar pan…" required minlength="2" />
-      </div>
-      <button class="btn" type="submit">Agregar</button>
-    </form>
-    <ul id="todoList"></ul>
-  </article>
-</div>
+<section class="kanban-container" aria-label="Tablero Kanban">
+  <div class="app-title">
+    <h1 class="app-name">TaskListAPP</h1>
+  </div>
+
+  <div class="kanban-header">
+    <h1>Tablero Kanban</h1>
+    <a class="btn" href="#/createTask">+ Nueva tarea</a>
+  </div>
+
+  <div id="kanbanBoard" class="kanban-board">
+    <div class="kanban-column" data-status="Por hacer">
+      <h2 class="kanban-title">Por hacer</h2>
+      <ul class="kanban-list" id="todoList-todo"></ul>
+    </div>
+
+    <div class="kanban-column" data-status="En progreso">
+      <h2 class="kanban-title">En progreso</h2>
+      <ul class="kanban-list" id="todoList-progress"></ul>
+    </div>
+
+    <div class="kanban-column" data-status="Completada">
+      <h2 class="kanban-title">Completada</h2>
+      <ul class="kanban-list" id="todoList-done"></ul>
+    </div>
+  </div>
+</section>
+
+<!-- Zona de eliminación: arrastra aquí para eliminar una tarea -->
+<div id="deleteZone" class="delete-zone" aria-hidden="false">ELIMINAR</div>
