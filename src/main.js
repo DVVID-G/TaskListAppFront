@@ -6,7 +6,6 @@
  */
 
 import './styles/base.css';
-import './styles/signup.css';
 import { initLogin } from './js/login.js';
 
 if (window.location.pathname.includes('login')) {
