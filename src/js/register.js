@@ -102,7 +102,9 @@ export function initRegister() {
     };
 
     try {
-      const res = await fetch("http://localhost:3000/api/v1/users", {
+      const base = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+      console.log('[initRegister] using base URL', base);
+      const res = await fetch(`${base.replace(/\/$/, '')}/api/v1/users`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(userData),
