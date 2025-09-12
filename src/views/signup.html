@@ -1,79 +1,62 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Registro</title>
-  <link rel="stylesheet" href="./css/styles.css" />
-</head>
-<body>
+<div class="login-page">
+  <div class="login-card">
+    <header style="text-align:left;margin-bottom:0.75rem;">
+      <a class="link" href="#/home">← Volver</a>
+    </header>
 
-  <div class="container">
-    <article class="card">
-      <header class="toolbar">
-        <a class="link" href="#/home">← Volver</a>
-      </header>
+    <h2 style="margin-top:0">Registro</h2>
 
-      <h1>Registro</h1>
+    <form id="registerForm" class="form" autocomplete="off" novalidate>
+      <div class="row center-row">
+        <label for="firstName">Nombres</label>
+        <div class="input-wrap"><input id="firstName" name="firstName" type="text" placeholder="Ej: Kevin Andrés" required minlength="2" /></div>
+        <small class="error-msg" id="firstNameError"></small>
+      </div>
 
-      <form id="registerForm" class="form" autocomplete="off" novalidate>
-        <!-- Nombres -->
-        <div class="row">
-          <label for="firstName">Nombres</label>
-          <input id="firstName" name="firstName" type="text" placeholder="Ej: Kevin Andrés" required minlength="2" />
-          <small class="error-msg" id="firstNameError"></small>
-        </div>
+      <div class="row center-row">
+        <label for="lastName">Apellidos</label>
+        <div class="input-wrap"><input id="lastName" name="lastName" type="text" placeholder="Ej: Toro García" required minlength="2" /></div>
+        <small class="error-msg" id="lastNameError"></small>
+      </div>
 
-        <!-- Apellidos -->
-        <div class="row">
-          <label for="lastName">Apellidos</label>
-          <input id="lastName" name="lastName" type="text" placeholder="Ej: Toro García" required minlength="2" />
-          <small class="error-msg" id="lastNameError"></small>
-        </div>
+      <div class="row center-row">
+        <label for="age">Edad</label>
+        <div class="input-wrap"><input id="age" name="age" type="number" placeholder="Ej: 18" required min="13" /></div>
+        <small class="error-msg" id="ageError"></small>
+      </div>
 
-        <!-- Edad -->
-        <div class="row">
-          <label for="age">Edad</label>
-          <input id="age" name="age" type="number" placeholder="Ej: 18" required min="13" />
-          <small class="error-msg" id="ageError"></small>
-        </div>
+      <div class="row center-row">
+        <label for="email">Correo electrónico</label>
+        <div class="input-wrap"><input id="email" name="email" type="email" placeholder="Ej: kevin@email.com" required /></div>
+        <small class="error-msg" id="emailError"></small>
+      </div>
 
-        <!-- Correo -->
-        <div class="row">
-          <label for="email">Correo electrónico</label>
-          <input id="email" name="email" type="email" placeholder="Ej: kevin@email.com" required />
-          <small class="error-msg" id="emailError"></small>
-        </div>
-
-        <!-- Contraseña -->
-        <div class="row">
-          <label for="password">Contraseña</label>
+      <div class="row center-row">
+        <label for="password">Contraseña</label>
+        <div class="input-wrap">
           <input id="password" name="password" type="password" placeholder="Mínimo 8 caracteres" required minlength="8" />
-          <small class="error-msg" id="passwordError"></small>
+          <button id="togglePasswordReg" type="button" class="toggle-pass" aria-pressed="false" aria-label="Mostrar contraseña">Mostrar</button>
         </div>
+        <small class="error-msg" id="passwordError"></small>
+      </div>
 
-        <!-- Confirmar contraseña -->
-        <div class="row">
-          <label for="confirmPassword">Confirmar contraseña</label>
+      <div class="row center-row">
+        <label for="confirmPassword">Confirmar contraseña</label>
+        <div class="input-wrap">
           <input id="confirmPassword" name="confirmPassword" type="password" placeholder="Repite la contraseña" required minlength="8" />
-          <small class="error-msg" id="confirmPasswordError"></small>
+          <button id="toggleConfirmReg" type="button" class="toggle-pass" aria-pressed="false" aria-label="Mostrar contraseña">Mostrar</button>
         </div>
+        <small class="error-msg" id="confirmPasswordError"></small>
+      </div>
 
-        <!-- Botón -->
-        <div class="row">
-          <button id="registerBtn" type="submit" class="btn">
-            <span id="btnText">Registrarse</span>
-            <span id="spinner" class="spinner" style="display:none;"></span>
-          </button>
-        </div>
+      <div class="row">
+        <button id="registerBtn" type="submit" class="btn">
+          <span id="btnText">Registrarse</span>
+          <span id="spinner" class="spinner" style="display:none;"></span>
+        </button>
+      </div>
 
-        <p id="registerMsg"></p>
-      </form>
-    </article>
+      <p id="registerMsg"></p>
+    </form>
   </div>
-
-  <!-- Carga de JS -->
-  <script type="module" src="./view/signup.html"></script>
-
-</body>
-</html>
+</div>

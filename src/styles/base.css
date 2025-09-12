@@ -26,10 +26,14 @@ body {
 }
 
 .card {
-    background-color: var(--card-background);
+    /* Match the login-card visual style so all cards look consistent */
+    background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
+    border: 1px solid rgba(255,255,255,0.06);
+    backdrop-filter: blur(6px);
     padding: 30px;
     border-radius: 12px;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.7);
+    box-shadow: 0 8px 30px rgba(2,6,23,0.6);
+    color: #fff;
 }
 
 /* Centered login page */
@@ -117,6 +121,23 @@ body {
     color: #fff;
     font-size: 1rem;
     line-height: 1.2;
+}
+
+/* Make number inputs (e.g. edad) visually identical to text inputs */
+.input-wrap input[type='number'] {
+    -moz-appearance: textfield; /* Firefox */
+    appearance: textfield;
+}
+.input-wrap input[type='number']::-webkit-outer-spin-button,
+.input-wrap input[type='number']::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+.input-wrap input[type='number'] {
+    padding-right: 1rem; /* no toggle, keep padding */
+    background: rgba(255,255,255,0.03); /* match text/password inputs */
+    border: 1px solid rgba(255,255,255,0.08);
+    color: #fff;
 }
 
 /* Make toggle button visually small and not affect input height */
