@@ -24,6 +24,9 @@ async function loadView(name) {
   if (name === 'home') initHome();
   if (name === 'board') initBoard();
   if (name === 'signup') initSignup();
+  if (name === 'reset-password') {
+    import('../js/resetPassword.js').then(module => { module.initResetPassword(); });
+  }
   if (name === 'createTask') {
     import('../js/createTask.js').then(module => {
       module.initCreateTask();
@@ -46,7 +49,7 @@ export function initRouter() {
  */
 function handleRoute() {
   const path = (location.hash.startsWith('#/') ? location.hash.slice(2) : '') || 'home';
-  const known = ['home', 'board', 'signup', 'createTask'];
+  const known = ['home', 'board', 'signup', 'createTask', 'reset-password'];
   const route = known.includes(path) ? path : 'home';
 
   loadView(route).catch(err => {
