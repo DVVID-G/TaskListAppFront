@@ -19,11 +19,82 @@ async function loadView(name) {
   const res = await fetch(viewURL(name));
   if (!res.ok) throw new Error(`Failed to load view: ${name}`);
   const html = await res.text();
-  app.innerHTML = html;
+
+  // Parse the fragment so we can properly move <script> and <link>/<style> tags into the document
+  const tpl = document.createElement('template');
+  tpl.innerHTML = html.trim();
+
+  // Move styles and links to the head so they take effect
+  const styles = tpl.content.querySelectorAll('link[rel="stylesheet"], style');
+  styles.forEach(node => {
+    // Avoid duplicating same href/style by simple href/text check
+    if (node.tagName === 'LINK') {
+      const href = node.getAttribute('href');
+      if (href && !document.querySelector(`link[rel="stylesheet"][href="${href}"]`)) {
+        document.head.appendChild(node.cloneNode(true));
+      }
+    } else {
+      // inline style
+      const text = node.textContent || '';
+      const dup = Array.from(document.head.querySelectorAll('style')).some(s => s.textContent === text);
+      if (!dup) document.head.appendChild(node.cloneNode(true));
+    }
+  });
+
+  // Extract scripts so they execute (scripts inserted via innerHTML don't run)
+  const scripts = tpl.content.querySelectorAll('script');
+  const scriptNodes = [];
+  scripts.forEach(s => {
+    // Keep copy for later execution, and remove from template so it won't be inserted as inert script
+    const copy = document.createElement('script');
+    // copy attributes
+    for (let i = 0; i < s.attributes.length; i++) {
+      const a = s.attributes[i];
+      copy.setAttribute(a.name, a.value);
+    }
+    copy.text = s.textContent || '';
+    scriptNodes.push(copy);
+    s.remove();
+  });
+
+  // Insert the remaining HTML into the app
+  app.innerHTML = '';
+  app.appendChild(tpl.content.cloneNode(true));
+
+  // Now append scripts to body so they execute in order
+  for (const sn of scriptNodes) {
+    // Avoid duplicating external scripts by src
+    const src = sn.getAttribute('src');
+    if (src) {
+      if (document.querySelector(`script[src="${src}"]`)) continue;
+    }
+    // For inline scripts, avoid appending identical script text twice (prevents redeclare errors)
+    if (!src) {
+      const text = sn.text || sn.textContent || '';
+      const already = Array.from(document.querySelectorAll('script')).some(s => (s.textContent || '').trim() === (text || '').trim());
+      if (already) continue;
+    }
+    // append and wait for external scripts to load before continuing
+    const p = new Promise((resolve) => {
+      sn.onload = () => resolve();
+      sn.onerror = () => resolve();
+      document.body.appendChild(sn);
+      if (!src) resolve();
+    });
+    // wait synchronously to preserve script execution order
+    // eslint-disable-next-line no-await-in-loop
+    await p;
+  }
 
   if (name === 'home') initHome();
   if (name === 'board') initBoard();
   if (name === 'signup') initSignup();
+  if (name === 'profile') {
+    // Lazy-load the profile module and initialize it when the view is shown
+    import('../js/profile.js').then(module => {
+      try { module.loadProfile && module.loadProfile(); } catch (e) { console.error('initProfile error', e); }
+    }).catch(err => console.error('Could not load Profile module', err));
+  }
   if (name === 'reset-password') {
     import('../js/resetPassword.js').then(module => { module.initResetPassword(); });
   }
@@ -52,7 +123,7 @@ function handleRoute() {
   // Example: '#/reset-password?token=...' -> 'reset-password'
   const raw = location.hash.startsWith('#/') ? location.hash.slice(2) : '';
   const path = raw ? raw.split('?')[0] : 'home';
-  const known = ['home', 'board', 'signup', 'createTask', 'reset-password'];
+  const known = ['home', 'board', 'signup', 'createTask', 'reset-password', 'profile'];
   const route = known.includes(path) ? path : 'home';
 
   loadView(route).catch(err => {
@@ -71,7 +142,7 @@ function initHome() {
   // If a login form is present, initialize the login logic from src/js/Login.js
   const loginForm = document.getElementById('loginForm');
   if (loginForm) {
-    import('../js/login.js').then(mod => {
+  import('../js/login.js').then(mod => {
       try { mod.initLogin(); } catch (e) { console.error('initLogin error', e); }
     }).catch(err => console.error('Could not load Login module', err));
 

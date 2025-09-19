@@ -1,18 +1,22 @@
-<header class="app-header">
-  <div class="app-left">
+<header class="app-header" style="position:relative; min-height:96px; padding:0.5rem 1rem;">
+  <!-- left placeholder to keep spacing -->
+  <div class="app-left" style="min-width:64px;"></div>
+
+  <!-- centered brand (absolute) -->
+  <div style="position:absolute; left:50%; top:50%; transform:translate(-50%,-50%);" class="header-logo-wrapper">
     <div class="app-brand">
-      <img src="/logo.png" alt="Tasklistapp Logo" class="logo" />
+      <img src="/logo.png" alt="Tasklistapp Logo" class="app-logo" />
     </div>
   </div>
 
-  <div class="app-right">
-    <div id="userArea" class="user-area">
+  <div class="app-right" style="display:flex; align-items:center; height:100%;">
+    <div id="userArea" class="user-area" style="display:flex; align-items:center; gap:0.5rem;">
       <img id="avatarBtn" class="avatar" src="/user.svg" alt="avatar">
       <div id="avatarMenu" class="avatar-menu" aria-hidden="true">
         <ul>
-          <li><a href="#">Ver perfil</a></li>
-          <li><a href="#">Configuración</a></li>
-          <li><a href="#">Cerrar sesión</a></li>
+          <li><a id="viewProfileLink" href="#/profile">Ver perfil</a></li>
+          <li><a href="#">Configuraci\u00f3n</a></li>
+          <li><a href="#">Cerrar sesi\u00f3n</a></li>
         </ul>
       </div>
     </div>
