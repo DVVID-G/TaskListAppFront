@@ -1,18 +1,18 @@
 :root {
-    --primary-color: #1abc9c;       /* Verde agua para botones */
-    --secondary-color: #16a085;     /* Verde más oscuro para hover */
+    --primary-color: #3B82F6;       /* Verde agua para botones */
+    --secondary-color: #3B82F6;     /* Verde más oscuro para hover */
     --background-color: #121212;    /* Fondo muy oscuro */
     --card-background: #1e1e1e;     /* Tarjeta ligeramente más clara */
     --text-color: #ecf0f1;          /* Texto claro */
     --border-color: #34495e;        /* Bordes elegantes */
     --error-color: #e74c3c;         /* Rojo para errores */
-    --success-color: #2ecc71;       /* Verde para éxito */
+    --success-color: #3B82F6;       /* Verde para éxito */
     --font-family: 'Open Sans', sans-serif;
 }
 
 body {
     font-family: var(--font-family);
-    background: radial-gradient(ellipse at bottom, #5b0d6a 0%, #2b0b3a 40%, #0e0b14 100%);
+    background: linear-gradient(180deg, #f4f8ff 0%, #eef4ff 100%);
     color: var(--text-color);
     margin: 0;
     padding: 0;
@@ -38,32 +38,38 @@ body {
 
 /* Centered login page */
 .login-page {
-    min-height: calc(100vh - 80px);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 2rem;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column; /* coloca logo arriba y tarjeta abajo en columna */
+  align-items: center;    /* centra horizontalmente */
+  justify-content: flex-start; /* evita el centrado vertical */
+  padding: 2rem 1rem;
+  margin-top: 0;
 }
 
 .login-card {
     width: 100%;
-    max-width: 380px;
-    background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.03));
+    max-width: 420px;
+    background: linear-gradient(180deg, rgba(29,67,101,0.95), rgba(22,52,80,0.95));
     border: 1px solid rgba(255,255,255,0.06);
     backdrop-filter: blur(8px);
-    border-radius: 12px;
-    padding: 1.5rem;
-    box-shadow: 0 8px 30px rgba(2,6,23,0.6);
+    border-radius: 14px;
+    padding: 2rem 2rem 2.4rem 2rem;
+    box-shadow: 0 12px 40px rgba(2,6,23,0.35);
     color: #fff;
+    margin-top: 0;
 }
 
 .login-card h2 {
-    margin: 0 0 1rem 0;
-    font-size: 1.25rem;
+    margin: 0 0 1.25rem 0;
+    font-size: 1.35rem;
     text-align: center;
+    font-weight: 700;
+    letter-spacing: 0.6px;
 }
 
 .login-card .row {
+    margin-top: 0;
     margin-bottom: 0.75rem;
 }
 
@@ -81,9 +87,10 @@ body {
     padding: 0.6rem 0.75rem;
     border-radius: 8px;
     border: 1px solid rgba(255,255,255,0.08);
-    background: rgba(255,255,255,0.03);
-    color: #fff;
+    background: #fff;
+    color:  #6B7280;
     outline: none;
+    
 }
 
 .input-wrap { position: relative; }
@@ -99,10 +106,11 @@ body {
     border-radius: 6px;
     cursor: pointer;
     font-size: 0.85rem;
+    background-color: #D1D5DB;
 }
 .input-wrap .toggle-pass:focus { box-shadow: 0 0 0 3px rgba(37,99,235,0.14); }
 
-.login-card input::placeholder { color: rgba(255,255,255,0.45); }
+
 .login-card input:focus {
     border-color: rgba(37,99,235,0.9);
     box-shadow: 0 6px 18px rgba(37,99,235,0.06), 0 0 0 4px rgba(37,99,235,0.06);
@@ -135,9 +143,9 @@ body {
 }
 .input-wrap input[type='number'] {
     padding-right: 1rem; /* no toggle, keep padding */
-    background: rgba(255,255,255,0.03); /* match text/password inputs */
+    background: #fff; /* match text/password inputs */
     border: 1px solid rgba(255,255,255,0.08);
-    color: #fff;
+    color: #6B7280;
 }
 
 /* Make toggle button visually small and not affect input height */
@@ -156,13 +164,90 @@ body {
     align-items: center;
     color: var(--primary-color);
 }
+/*Volver al login desde el register*/
+.back-to-login {
+  text-align: center;   /* ✅ centrado */
+  margin-top: 1rem;
+  font-size: 0.9rem;
+  color: #E5E7EB;       /* gris claro para el texto */
+}
 
+.back-to-login .link {
+  color: #3B82F6;       /* azul medio */
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+.back-to-login .link:hover {
+  color: #60A5FA;       /* azul más claro al hover */
+  text-decoration: underline;
+}
+.back-to-login a:visited {
+  color: #3B82F6; /* evita el morado */
+}
+
+/*Logo de la pagina*/
+ 
+.logo {
+  max-width: 380px;
+  max-height:150px;  /* Tamaño máximo en pantallas grandes */
+  width: 100%;       /* Ocupará todo el ancho disponible hasta el max */
+  height: auto;   /* Mantiene proporción */
+  display: block; /* Evita márgenes raros */
+  margin: 0 auto; /* Lo centra horizontalmente */
+  display: block;
+  padding: 0;
+  overflow: hidden;
+}
+header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 0px; /* ajusta separación con la tarjeta */
+}
+
+header .logo {
+  max-width: 380px;  /* tamaño controlado y responsive */
+  width: 100%;
+  height: auto;
+}
 /* Center labels and inputs horizontally inside login rows */
 .center-row { display:flex; flex-direction:column; align-items:center; }
 .center-row label { text-align:center; width:100%; }
-.center-row input { max-width: 320px; }
+.center-row input { max-width: 330px; }
 /* Ensure the input wrapper itself is centered and constrained so the toggle aligns inside the field */
-.center-row .input-wrap { max-width: 320px; width: 100%; margin: 0 auto; }
+.center-row .input-wrap { max-width: 330px; width: 100%; margin: 0 auto; }
+
+/* Ensure textarea and select match the title input width */
+.center-row .input-wrap textarea,
+.center-row .input-wrap select {
+    max-width: 300px;
+    width: 100%;
+    margin: 0 auto;
+}
+
+/* For createTask specifically: white textarea background and dark text for readability */
+.login-card #description,
+.login-card #description:focus,
+.login-card .input-wrap textarea {
+    background: #fff !important;
+    color: #111 !important;
+}
+
+/* Dark border for white textarea to match input style */
+.login-card .input-wrap textarea {
+    border: 1px solid rgba(0,0,0,0.08);
+}
+
+/* Style footer 'Volver al tablero' link */
+.back-to-login { text-align: center; margin-top: 0.75rem; }
+.back-to-login .back-board {
+    color: #8fb1ff;
+    text-decoration: none;
+    font-weight: 600;
+}
+.back-to-login .back-board:hover { color: #dbe9ff; text-decoration: underline; }
 
 /* Forgot password link style */
 #forgotPassword { color: var(--primary-color); text-decoration: none; }
@@ -181,6 +266,7 @@ body {
     color: #fff;
     font-weight: 600;
 }
+    
 
 .spinner {
     width: 14px;
@@ -210,7 +296,13 @@ body {
 .toolbar .link:hover {
     color: var(--primary-color);
 }
-
+.login-card input[type="text"]::placeholder,
+.login-card input[type="password"]::placeholder,
+.login-card input[type="email"]::placeholder,
+.input-wrap input[type='number']::placeholder {
+  color: #6B7280;
+  opacity: 1;
+}
 h1 {
     text-align: center;
     margin-bottom: 25px;
@@ -244,6 +336,53 @@ h1 {
     outline: none;
 }
 
+/* Make textarea look like other inputs */
+.form textarea,
+.input-wrap textarea {
+    padding: 10px 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 1rem;
+    background-color: #1a1a1a;
+    color: var(--text-color);
+    transition: border 0.3s;
+    min-height: 120px;
+    resize: vertical; /* allow vertical resize only */
+}
+
+.form textarea:focus,
+.input-wrap textarea:focus {
+    border-color: var(--primary-color);
+    outline: none;
+    box-shadow: 0 6px 18px rgba(37,99,235,0.06), 0 0 0 4px rgba(37,99,235,0.04);
+}
+
+/* Style select elements to match inputs */
+.form select,
+.input-wrap select {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    padding: 10px 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 1rem;
+    background-color: #1a1a1a;
+    color: var(--text-color);
+    transition: border 0.3s;
+    background-image: linear-gradient(45deg, transparent 50%, var(--text-color) 50%), linear-gradient(135deg, var(--text-color) 50%, transparent 50%);
+    background-position: calc(100% - 18px) calc(1em + 2px), calc(100% - 13px) calc(1em + 2px);
+    background-size: 5px 5px, 5px 5px;
+    background-repeat: no-repeat;
+}
+
+.form select:focus,
+.input-wrap select:focus {
+    border-color: var(--primary-color);
+    outline: none;
+    box-shadow: 0 6px 18px rgba(37,99,235,0.06), 0 0 0 4px rgba(37,99,235,0.04);
+}
+
 .error-msg {
     color: var(--error-color);
     font-size: 0.85rem;
@@ -252,25 +391,26 @@ h1 {
 
 .btn {
     width: 100%;
-    padding: 12px;
-    background-color: var(--primary-color);
+    padding: 12px 14px;
+    background-color: #3B82F6;
     color: var(--text-color);
     border: none;
-    border-radius: 8px;
-    font-size: 1rem;
+    border-radius: 10px;
+    font-size: 1.02rem;
     cursor: pointer;
     display: flex;
     justify-content: center;
     align-items: center;
-    transition: background-color 0.3s;
+    transition: transform 0.08s ease, box-shadow 0.12s ease, background-color 0.18s ease;
 }
 
 .btn:hover {
-    background-color: var(--secondary-color);
+    transform: translateY(-1px);
+    box-shadow: 0 8px 24px rgba(59,130,246,0.18);
 }
 
 .btn:disabled {
-    background-color: #16a08599; /* versión más clara y transparente */
+    background-color: #3B82F6; /* versión más clara y transparente */
     cursor: not-allowed;
 }
 
@@ -296,6 +436,29 @@ h1 {
     color: var(--success-color);
 }
 
+/* General success / error message used across forms */
+.success-msg {
+    text-align: center;
+    margin-top: 12px;
+    font-weight: 600;
+    color: var(--success-color);
+}
+.error-msg { /* override default error-msg for center messages if used */
+    text-align: center;
+}
+
+/* CreateTask specific message */
+#createTaskMsg {
+    text-align: center;
+    margin-top: 14px;
+    font-weight: 600;
+    color: var(--success-color);
+}
+
+.login-header { text-align: center; margin-bottom: 8px; }
+.login-header .link { color: #4b2b7f; text-decoration: none; font-weight: 600; }
+.login-header .link:hover { text-decoration: underline; color: #6942a8; }
+
 @media (max-width: 480px) {
     .card {
         padding: 20px;
@@ -313,6 +476,7 @@ h1 {
     align-items:center;
     padding: 18px 36px;
     gap:12px;
+    margin-bottom: 0;
 }
 
 .app-left { display:flex; align-items:center; gap:16px; }
@@ -355,11 +519,11 @@ h1 {
     justify-content:space-between;
     align-items:center;
     gap:1rem;
-    margin-bottom:1rem;
+    margin-bottom:0;
 }
 
 .kanban-header h1 {
-    margin:0;
+    margin:0 auto;
     font-size:1.8rem;
     color:var(--text-color);
 }

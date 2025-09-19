@@ -5,6 +5,7 @@ export function initCreateTask() {
   const title = document.getElementById("title");
   const description = document.getElementById("description");
   const status = document.getElementById("status");
+  const userInput = document.getElementById('user');
 
 
   const btn = document.getElementById("createTaskBtn");
@@ -12,11 +13,10 @@ export function initCreateTask() {
   const spinner = document.getElementById("spinner");
   const msg = document.getElementById("createTaskMsg");
 
-  // Autocompletar el campo de usuario con el ID autenticado si existe en localStorage
-  const userId = localStorage.getItem('userId');
-  if (userId) {
-    user.value = userId;
-    user.readOnly = true;
+  // Autocompletar el campo de usuario oculto con el ID autenticado si existe en localStorage
+  const storedUserId = localStorage.getItem('userId');
+  if (storedUserId && userInput) {
+    try { userInput.value = storedUserId; } catch (e) {}
   }
 
   const errors = {
@@ -75,12 +75,18 @@ export function initCreateTask() {
       const data = await res.json().catch(() => ({}));
       if (res.ok) {
         msg.textContent = "✅ Tarea creada con éxito";
+        msg.className = 'success-msg';
+        // Reset form but keep the stored user id and status default
+        const oldStatus = status.value;
         form.reset();
+        if (userInput && storedUserId) userInput.value = storedUserId;
+        try { status.value = oldStatus; } catch (e) {}
       } else {
         msg.textContent = data.message || data.error || `Error ${res.status}`;
       }
-    } catch (err) {
+      } catch (err) {
       msg.textContent = "Error de red. Intenta de nuevo.";
+      msg.className = 'error-msg';
     } finally {
       btn.disabled = false;
       btnText.textContent = "Crear tarea";
