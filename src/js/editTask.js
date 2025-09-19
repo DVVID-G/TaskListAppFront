@@ -26,6 +26,36 @@ export function initEditTask() {
     statusError: document.getElementById('statusError')
   };
 
+  /**
+   * Map UI status label to backend enum value. Reads overrides from localStorage (statusMap_v1).
+   */
+  function mapStatusForBackend(uiStatus) {
+    if (!uiStatus) return uiStatus;
+    const defaults = {
+      'Por hacer': 'Por hacer',
+      'En progreso': 'Haciendo',
+      'Completada': 'Hecho'
+    };
+    try {
+      const raw = localStorage.getItem('statusMap_v1');
+      const map = raw ? JSON.parse(raw) : {};
+      // Prefer internal defaults mapping to avoid sending UI labels by mistake.
+      if (defaults[uiStatus]) {
+        // If user has provided an override that's different, log it but still prefer defaults
+        if (map[uiStatus] && map[uiStatus] !== defaults[uiStatus]) {
+          try { console.warn('[editTask] Found user override for status mapping but using default mapping to avoid invalid enum', { uiStatus, override: map[uiStatus], default: defaults[uiStatus] }); } catch (e) {}
+        }
+        return defaults[uiStatus];
+      }
+      if (map[uiStatus]) return map[uiStatus];
+    } catch (e) {
+      // ignore
+    }
+    const result = defaults[uiStatus] || uiStatus;
+    try { console.debug('[editTask] mapStatusForBackend:', { uiStatus, mapped: result, localOverrides: raw ? JSON.parse(raw || '{}') : {} }); } catch (e) {}
+    return result;
+  }
+
   function validate() {
     let valid = true;
     if (title.value.trim().length < 2) {
@@ -101,9 +131,11 @@ export function initEditTask() {
     const taskData = {
       title: title.value.trim(),
       description: description.value.trim(),
-      status: status.value,
+      status: mapStatusForBackend(status.value),
       user: localStorage.getItem('userId') || ''
     };
+    // Debug: show payload that will be sent
+    try { console.debug('[editTask] submit payload:', taskData); } catch (e) {}
     try {
       const base = import.meta.env.VITE_API_URL || 'http://localhost:3000';
       const token = localStorage.getItem('token');
