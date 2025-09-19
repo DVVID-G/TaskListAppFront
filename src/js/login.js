@@ -131,7 +131,7 @@ export function initLogin() {
 
     console.log('[initLogin] submitting', userData);
     try {
-      const base = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+  const base = (import.meta.env.VITE_API_URL || 'http://localhost:3000').replace(/\/$/, '');
       console.log('[initLogin] using base URL', base);
       const res = await fetch(`${base}/api/v1/auth/login`, {
         method: 'POST',
@@ -405,8 +405,8 @@ export function initLogin() {
         try {
           // Save the email used to request reset so the reset page can try auto-login if needed
           try { localStorage.setItem('lastResetEmail', emailVal); } catch (e) { /* ignore */ }
-          const base = import.meta.env.VITE_API_URL || 'http://localhost:3000';
-          const url = `${base.replace(/\/$/, '')}/api/v1/auth/forgot-password`;
+          const base = (import.meta.env.VITE_API_URL || 'http://localhost:3000').replace(/\/$/, '');
+          const url = `${base}/api/v1/auth/forgot-password`;
           const resp = await fetch(url, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
