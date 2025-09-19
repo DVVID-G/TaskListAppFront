@@ -1,32 +1,30 @@
-<div class="app-shell">
-  <header class="app-header">
-    <div class="app-left">
-      <div class="app-brand">
-        <div class="logo">TaskFlow</div>
-        <div class="subtitle">Gestión de proyectos</div>
-      </div>
-      <a class="btn new-task-btn" href="#/createTask">+ Nueva tarea</a>
+<header class="app-header">
+  <div class="app-left">
+    <div class="app-brand">
+      <img src="/src/assets/img/logo.png" alt="Tasklistapp Logo" class="logo" />
     </div>
+  </div>
 
-    <div class="app-right">
-      <div id="userArea" class="user-area">
-        <img id="avatarBtn" class="avatar" src="/favicon.png" alt="avatar">
-        <div id="avatarMenu" class="avatar-menu" aria-hidden="true">
-          <ul>
-            <li><a href="#">Ver perfil</a></li>
-            <li><a href="#">Configuración</a></li>
-            <li><a href="#">Cerrar sesión</a></li>
-          </ul>
-        </div>
+  <div class="app-right">
+    <div id="userArea" class="user-area">
+      <img id="avatarBtn" class="avatar" src="/src/assets/img/user.svg" alt="avatar">
+      <div id="avatarMenu" class="avatar-menu" aria-hidden="true">
+        <ul>
+          <li><a href="#">Ver perfil</a></li>
+          <li><a href="#">Configuración</a></li>
+          <li><a href="#">Cerrar sesión</a></li>
+        </ul>
       </div>
     </div>
-  </header>
+  </div>
+</header>
 
   <main class="kanban-main">
     <div id="kanbanBoard" class="kanban-board">
       <div class="kanban-column" data-status="Por hacer">
         <h2 class="kanban-title">Por hacer</h2>
         <ul class="kanban-list" id="todoList-todo"></ul>
+        <a class="btn new-task-btn" href="#/createTask">+</a>
       </div>
 
       <div class="kanban-column" data-status="En progreso">
@@ -40,8 +38,7 @@
       </div>
     </div>
 
-    <div id="deleteZone" class="delete-zone">
-      <button class="delete-btn">🗑️ Arrastra aquí para eliminar</button>
+    
     </div>
   </main>
 </div>

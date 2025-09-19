@@ -1,5 +1,7 @@
 // src/js/register.js
 
+import { loginUser } from '../services/userService.js';
+
 export function initRegister() {
   const form = document.getElementById("registerForm");
   const btn = document.getElementById("registerBtn");
@@ -21,6 +23,7 @@ export function initRegister() {
     passwordError: document.getElementById("passwordError"),
     confirmPasswordError: document.getElementById("confirmPasswordError"),
   };
+  const registerMsg = document.getElementById('registerMsg');
 
   // Regex: mínimo 8 caracteres, 1 mayúscula, 1 minúscula, 1 número, 1 símbolo
   const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
@@ -111,25 +114,64 @@ export function initRegister() {
       });
 
       if (res.status === 201) {
-        if (btnText) btnText.textContent = 'Registrarse';
-        if (spinner) spinner.style.display = 'none';
-        alert("✅ Cuenta creada con éxito");
-        setTimeout(() => (window.location.hash = "#/login"), 500);
+        // Try to parse body for token
+        let body = null;
+        try { body = await res.json(); } catch (e) { body = null; }
+        const token = body && (body.token || body.accessToken || body.authToken || (body.data && body.data.token));
+        if (token) {
+          try { localStorage.setItem('token', token); } catch (e) {}
+          if (btnText) btnText.textContent = 'Registrarse';
+          if (spinner) spinner.style.display = 'none';
+          if (registerMsg) { registerMsg.textContent = '✅ Cuenta creada y login automático realizado'; registerMsg.className = 'success-msg'; }
+          setTimeout(() => (window.location.hash = '#/board'), 400);
+          return;
+        }
+
+        // No token in response: attempt login with provided credentials
+        try {
+          const loginResp = await loginUser({ email: userData.email, password: userData.password });
+          const loginToken = loginResp && (loginResp.token || loginResp.accessToken || loginResp.authToken || (loginResp.data && loginResp.data.token));
+            if (loginToken) {
+            try { localStorage.setItem('token', loginToken); } catch (e) {}
+            if (btnText) btnText.textContent = 'Registrarse';
+            if (spinner) spinner.style.display = 'none';
+            if (registerMsg) { registerMsg.textContent = '✅ Cuenta creada y login automático realizado'; registerMsg.className = 'success-msg'; }
+            setTimeout(() => (window.location.hash = '#/board'), 400);
+            return;
+          }
+        } catch (err) {
+          console.warn('Auto-login after register failed:', err.message || err);
+        }
+
+        // Fallback: account created, redirect to login
+  if (btnText) btnText.textContent = 'Registrarse';
+  if (spinner) spinner.style.display = 'none';
+  if (registerMsg) { registerMsg.textContent = '✅ Cuenta creada con éxito'; registerMsg.className = 'success-msg'; }
+  setTimeout(() => (window.location.hash = "#/login"), 500);
       } else if (res.status === 409) {
         errors.emailError.textContent = "Este correo ya está registrado";
         if (btnText) btnText.textContent = 'Registrarse';
         if (spinner) spinner.style.display = 'none';
         btn.disabled = false;
       } else {
-        console.error(await res.text());
-        alert("Intenta de nuevo más tarde");
+        // Try to parse structured error body to provide better UX for duplicate-key errors
+        let body = null;
+        try { body = await res.json(); } catch (e) { /* not JSON */ }
+        const message = body && (body.message || body.error || JSON.stringify(body)) || await res.text().catch(() => '');
+        // Detect Mongo duplicate key error or common duplicate/email messages
+        if (typeof message === 'string' && /E11000|duplicate key|duplicate key error|email_1|email/i.test(message)) {
+          errors.emailError.textContent = "Este correo ya está registrado";
+        } else {
+          console.error(message);
+          if (registerMsg) { registerMsg.textContent = 'Intenta de nuevo más tarde'; registerMsg.className = 'error-msg'; }
+        }
         if (btnText) btnText.textContent = 'Registrarse';
         if (spinner) spinner.style.display = 'none';
         btn.disabled = false;
       }
     } catch (err) {
       console.error(err);
-      alert("Intenta de nuevo más tarde");
+      if (registerMsg) { registerMsg.textContent = 'Intenta de nuevo más tarde'; registerMsg.className = 'error-msg'; }
       if (btnText) btnText.textContent = 'Registrarse';
       if (spinner) spinner.style.display = 'none';
       btn.disabled = false;

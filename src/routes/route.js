@@ -48,7 +48,10 @@ export function initRouter() {
  * Fallback to 'home' if the route is unknown.
  */
 function handleRoute() {
-  const path = (location.hash.startsWith('#/') ? location.hash.slice(2) : '') || 'home';
+  // Get the hash path (without the leading '#/') and strip any query string.
+  // Example: '#/reset-password?token=...' -> 'reset-password'
+  const raw = location.hash.startsWith('#/') ? location.hash.slice(2) : '';
+  const path = raw ? raw.split('?')[0] : 'home';
   const known = ['home', 'board', 'signup', 'createTask', 'reset-password'];
   const route = known.includes(path) ? path : 'home';
 
@@ -194,12 +197,12 @@ async function initBoard() {
         // Mapear el status mostrado en la UI al valor que el backend espera
         const mappedStatus = mapStatusForBackend(newStatus);
         if (!taskId || !newStatus) {
-          alert('ID de tarea o estado destino no válido.');
+          showServerDebug(400, 'ID de tarea o estado destino no válido.');
           return;
         }
         // Validar formato de ID (MongoDB: 24 hex)
         if (!/^[a-fA-F0-9]{24}$/.test(taskId)) {
-          alert('ID de tarea inválido: ' + taskId);
+          showServerDebug(400, 'ID de tarea inválido: ' + taskId);
           return;
         }
         // Actualizar estado en backend (usar el valor mapeado para el backend)
@@ -274,7 +277,7 @@ async function initBoard() {
           showServerDebug(patchRes.status, patchBody || 'Sin cuerpo de respuesta');
           throw new Error((patchBody && patchBody) || 'No se pudo actualizar el estado');
         } catch (err) {
-          alert(err.message);
+          showServerDebug(500, err.message || String(err));
         }
       };
     });
@@ -317,7 +320,7 @@ async function initBoard() {
         }
         taskId = String(taskId || '').replace(/[:\/]/g, '').trim();
         if (!/^[a-fA-F0-9]{24}$/.test(taskId)) {
-          alert('ID de tarea inválido para eliminar: ' + taskId);
+          showServerDebug(400, 'ID de tarea inválido para eliminar: ' + taskId);
           return;
         }
         if (!confirm('¿Seguro que quieres eliminar esta tarea? Esta acción no se puede deshacer.')) return;
@@ -337,7 +340,7 @@ async function initBoard() {
           }
           initBoard();
         } catch (err) {
-          alert(err.message);
+          showServerDebug(500, err.message || String(err));
         }
       };
     }

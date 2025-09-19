@@ -1,37 +1,49 @@
-<div class="container">
-  <article class="card">
-    <header class="toolbar">
-      <a class="link" href="#/board">← Volver</a>
-    </header>
-    <h1>Crear tarea</h1>
-    <form id="createTaskForm" class="form" autocomplete="off">
-      <div class="row">
-        <label for="title">Título</label>
-        <input id="title" name="title" type="text" required minlength="2" placeholder="Ej: Terminar proyecto" />
+<div class="login-page">
+  <!-- Top back link removed per design request -->
+  <div class="login-card">
+    <h2 style="margin-top:0">Crear tarea</h2>
+
+    <form id="createTaskForm" class="form" autocomplete="off" novalidate>
+      <div class="row center-row">
+        <label for="title" class="label-login"></label>
+        <div class="input-wrap">
+          <input id="title" name="title" type="text" required minlength="2" placeholder="Ej: Terminar proyecto" />
+        </div>
         <small class="error-msg" id="titleError"></small>
       </div>
-      <div class="row">
-        <label for="description">Descripción</label>
-        <textarea id="description" name="description" required minlength="5" placeholder="Describe la tarea..."></textarea>
+
+      <div class="row center-row">
+        <label for="description" class="label-login"></label>
+        <div class="input-wrap">
+          <textarea id="description" name="description" required minlength="2" placeholder="Describe la tarea..."></textarea>
+        </div>
         <small class="error-msg" id="descriptionError"></small>
       </div>
-      <div class="row">
-        <label for="status">Estado</label>
-        <select id="status" name="status" required>
-          <option value="Por hacer">Por hacer</option>
-          <option value="En progreso">En progreso</option>
-          <option value="Completada">Completada</option>
-        </select>
+
+      <div class="row center-row">
+        <label for="status" class="label-login"></label>
+        <div class="input-wrap">
+          <select id="status" name="status" required>
+            <option value="Por hacer">Por hacer</option>
+            <option value="En progreso">En progreso</option>
+            <option value="Completada">Completada</option>
+          </select>
+        </div>
         <small class="error-msg" id="statusError"></small>
       </div>
-      <!-- El ID de usuario se asigna automáticamente desde localStorage, no se muestra al usuario -->
+
+      <!-- Hidden user id (populated by JS) -->
+      <input type="hidden" id="user" name="user" />
+
       <div class="row">
         <button id="createTaskBtn" type="submit" class="btn">
           <span id="btnText">Crear tarea</span>
           <span id="spinner" class="spinner" style="display:none;"></span>
         </button>
       </div>
+
+  <p class="back-to-login"><a class="back-board" href="#/board">Volver al tablero</a></p>
       <p id="createTaskMsg"></p>
     </form>
-  </article>
+  </div>
 </div>

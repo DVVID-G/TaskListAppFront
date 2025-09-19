@@ -3,17 +3,16 @@ export function initLogin() {
   const form = document.getElementById('loginForm');
   if (!form) return;
 
-  // If redirected from reset-password, show success message stored in localStorage
+  // Si viene redirigido desde reset-password, muestra mensaje de éxito
   try {
     const resetMsg = localStorage.getItem('resetSuccessMsg');
     if (resetMsg) {
-      // prefer inline element if exists
       const info = document.getElementById('infoMsg');
       if (info) {
         info.textContent = resetMsg;
         info.style.display = 'block';
       } else {
-        alert(resetMsg);
+        showMessage(resetMsg, 'success');
       }
       localStorage.removeItem('resetSuccessMsg');
     }
@@ -31,31 +30,70 @@ export function initLogin() {
     passwordError: document.getElementById('passwordError'),
   };
 
-  function validate() {
+  // Non-modal message helper (replaces alert())
+  function showMessage(text, type = 'info') {
+    try {
+      const info = document.getElementById('infoMsg') || document.getElementById('loginMsg');
+      if (info) {
+        info.textContent = text;
+        info.style.display = 'block';
+        info.style.color = type === 'error' ? 'var(--error-color)' : (type === 'success' ? 'var(--success-color)' : 'inherit');
+        return;
+      }
+      const container = document.createElement('div');
+      container.id = 'loginMsg';
+      container.textContent = text;
+      container.style.margin = '0.5rem 0';
+      container.style.padding = '0.5rem 0.75rem';
+      container.style.borderRadius = '4px';
+      container.style.background = type === 'error' ? '#fff3f3' : 'transparent';
+      container.style.color = type === 'error' ? 'var(--error-color)' : (type === 'success' ? 'var(--success-color)' : '#fff');
+      const ref = form || document.getElementById('app') || document.body;
+      ref.parentElement ? ref.parentElement.insertBefore(container, ref) : document.body.appendChild(container);
+    } catch (e) {
+      console[type === 'error' ? 'error' : 'log'](text);
+    }
+  }
+
+  /**
+   * 🔑 Nueva función de validación
+   * - Recibe `showErrors` (true/false) para decidir si mostrar mensajes.
+   * - Cuando se usa en tiempo real → showErrors = false (solo deshabilita botón).
+   * - Cuando el usuario da click en "Iniciar sesión" → showErrors = true (muestra mensajes).
+   */
+  function validate(showErrors = true) {
     let valid = true;
+
+    // Validar email
     if (!email.value || !email.validity.valid) {
-      errors.emailError.textContent = 'Correo inválido';
+      if (showErrors) errors.emailError.textContent = 'Correo inválido';
       valid = false;
     } else {
       errors.emailError.textContent = '';
     }
 
+    // Validar contraseña
     if (!password.value) {
-      errors.passwordError.textContent = 'Contraseña requerida';
+      if (showErrors) errors.passwordError.textContent = 'Contraseña requerida';
       valid = false;
     } else {
       errors.passwordError.textContent = '';
     }
 
+    // Deshabilita botón si no es válido
     btn.disabled = !valid;
     return valid;
   }
 
-  [email, password].forEach(input => input.addEventListener('input', validate));
-  // Run validation once at start to set initial button state
-  try { validate(); } catch (e) { /* ignore */ }
+  // Escuchar inputs pero sin mostrar mensajes de error, solo actualiza botón
+  [email, password].forEach(input =>
+    input.addEventListener('input', () => validate(false))
+  );
 
-  // Password toggle button
+  // Validar una vez al inicio (sin errores visibles)
+  try { validate(false); } catch (e) { /* ignore */ }
+
+  // Botón para mostrar/ocultar contraseña
   const toggleBtn = document.getElementById('togglePassword');
   if (toggleBtn) {
     toggleBtn.addEventListener('click', () => {
@@ -71,13 +109,16 @@ export function initLogin() {
         toggleBtn.setAttribute('aria-pressed', 'true');
         toggleBtn.setAttribute('aria-label', 'Ocultar contraseña');
       }
-      validate();
+      validate(false);
     });
   }
 
+  // Submit del formulario
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
-    if (!validate()) return;
+
+    // 🚨 Aquí validamos con showErrors = true (sí muestra mensajes)
+    if (!validate(true)) return;
 
     btn.disabled = true;
     if (btnText) btnText.textContent = 'Procesando...';
@@ -92,7 +133,7 @@ export function initLogin() {
     try {
       const base = import.meta.env.VITE_API_URL || 'http://localhost:3000';
       console.log('[initLogin] using base URL', base);
-      const res = await fetch(`${base.replace(/\/$/, '')}/api/v1/auth/login`, {
+      const res = await fetch(`${base}/api/v1/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(userData),
@@ -103,15 +144,15 @@ export function initLogin() {
       if (res.ok) {
         if (data.token) localStorage.setItem('token', data.token);
         if (data.user && data.user._id) localStorage.setItem('userId', data.user._id);
-        alert('✅ Login exitoso');
+        showMessage('✅ Login exitoso', 'success');
         setTimeout(() => (window.location.hash = '#/board'), 500);
       } else {
         const msg = data.message || data.error || `Error ${res.status}`;
-        alert(msg);
+        showMessage(msg, 'error');
       }
     } catch (err) {
       console.error('Login request failed:', err);
-      alert('Intenta de nuevo más tarde');
+      showMessage('Intenta de nuevo más tarde', 'error');
     } finally {
       btn.disabled = false;
       if (btnText) btnText.textContent = 'Iniciar sesión';
@@ -119,56 +160,290 @@ export function initLogin() {
     }
   });
 
-  // Forgot password link
-  const forgot = document.getElementById('forgotPassword');
-  if (forgot) {
-    forgot.addEventListener('click', async (ev) => {
-      ev.preventDefault();
-      // Ask for email via prompt as simple UI fallback, but validate before sending
-      const mail = prompt('Ingrese su correo para recibir instrucciones de recuperación:');
-      if (!mail) return alert('Operación cancelada');
-      const trimmed = String(mail).trim();
-      // basic email validation
-      if (!trimmed || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed)) {
-        return alert('Por favor ingresa un correo válido.');
-      }
+  // Forgot password link (robusta y con logs)
+  (function setupForgot() {
+    const forgot = document.getElementById('forgotPassword');
+    let forgotContainer = document.getElementById('forgotContainer');
+    let forgotForm = document.getElementById('forgotForm');
+    let forgotEmail = document.getElementById('forgotEmail');
+    let forgotEmailError = document.getElementById('forgotEmailError');
+    let forgotSendBtn = document.getElementById('forgotSendBtn');
+    let forgotBtnText = document.getElementById('forgotBtnText');
+    let forgotSpinner = document.getElementById('forgotSpinner');
+    let forgotMsg = document.getElementById('forgotMsg');
 
-      // send request to backend
-      try {
-        const base = import.meta.env.VITE_API_URL || 'http://localhost:3000';
-        const url = `${base.replace(/\/$/, '')}/api/v1/auth/forgot-password`;
-        console.log('[forgotPassword] POST ->', url, 'body=', { email: trimmed });
-        // Optionally show a spinner or disable UI - using alert flow for now
-        const resp = await fetch(url, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email: trimmed })
-        });
-
-        if (resp.ok) {
-          // If the backend returns a token directly (some implementations do for testing), pass it
-          let body = {};
-          try { body = await resp.json(); } catch (e) { body = {}; }
-          const token = body && body.token ? String(body.token) : null;
-          if (token) {
-            // redirect with token in query so reset form can prefill
-            window.location.hash = `#/reset-password?token=${encodeURIComponent(token)}`;
-            return;
-          }
-          alert('Si existe una cuenta con ese correo, recibirás instrucciones para recuperar la contraseña. Revisa tu bandeja de entrada. Serás redirigido a la pantalla de restablecimiento.');
-          // redirect user to reset-password view to follow instructions
-          window.location.hash = '#/reset-password';
-          return;
-        } else {
-          // try to parse body for a helpful message
-          let txt = '';
-          try { const j = await resp.json(); txt = j.message || j.error || JSON.stringify(j); } catch (e) { txt = await resp.text().catch(() => ''); }
-          alert(`No se pudo procesar la solicitud: ${resp.status} ${txt}`);
-        }
-      } catch (err) {
-        console.error('forgot-password error', err);
-        alert('Error de red. Intenta de nuevo más tarde.');
-      }
+    console.log('[initLogin] forgot elements', {
+      forgot: !!forgot,
+      forgotContainer: !!forgotContainer,
+      forgotForm: !!forgotForm,
+      forgotEmail: !!forgotEmail,
+      forgotSendBtn: !!forgotSendBtn
     });
-  }
+
+    // If there are duplicate IDs in the DOM (from previous dynamic creation), remove extras
+    try {
+      // Remove any forgot elements that are nested inside the login form (they block validation)
+      const nestedEmail = document.querySelectorAll('#loginForm #forgotEmail');
+      if (nestedEmail && nestedEmail.length) {
+        console.warn('[initLogin] removing forgotEmail elements nested inside #loginForm');
+        nestedEmail.forEach(el => el.remove());
+      }
+      const nestedBtn = document.querySelectorAll('#loginForm #forgotSendBtn');
+      if (nestedBtn && nestedBtn.length) {
+        console.warn('[initLogin] removing forgotSendBtn elements nested inside #loginForm');
+        nestedBtn.forEach(el => el.remove());
+      }
+      const nestedForm = document.querySelectorAll('#loginForm #forgotForm');
+      if (nestedForm && nestedForm.length) {
+        console.warn('[initLogin] removing forgotForm elements nested inside #loginForm');
+        nestedForm.forEach(el => el.remove());
+      }
+
+      // Also remove any plain duplicates keeping the first occurrence
+      const dupEmail = document.querySelectorAll('#forgotEmail');
+      if (dupEmail.length > 1) {
+        console.warn('[initLogin] found duplicate #forgotEmail, removing extras');
+        for (let i = 1; i < dupEmail.length; i++) dupEmail[i].remove();
+      }
+      const dupBtn = document.querySelectorAll('#forgotSendBtn');
+      if (dupBtn.length > 1) {
+        console.warn('[initLogin] found duplicate #forgotSendBtn, removing extras');
+        for (let i = 1; i < dupBtn.length; i++) dupBtn[i].remove();
+      }
+      const dupForm = document.querySelectorAll('#forgotForm');
+      if (dupForm.length > 1) {
+        console.warn('[initLogin] found duplicate #forgotForm, removing extras');
+        for (let i = 1; i < dupForm.length; i++) dupForm[i].remove();
+      }
+
+      // Re-query after cleanup
+      forgotContainer = document.getElementById('forgotContainer') || forgotContainer;
+      forgotForm = document.getElementById('forgotForm') || forgotForm;
+      forgotEmail = document.getElementById('forgotEmail') || forgotEmail;
+      forgotSendBtn = document.getElementById('forgotSendBtn') || forgotSendBtn;
+      forgotEmailError = document.getElementById('forgotEmailError') || forgotEmailError;
+      forgotBtnText = document.getElementById('forgotBtnText') || forgotBtnText;
+      forgotSpinner = document.getElementById('forgotSpinner') || forgotSpinner;
+      forgotMsg = document.getElementById('forgotMsg') || forgotMsg;
+
+      // Defensive: ensure the forgotEmail input is associated with the forgotForm (not the login form)
+      try {
+        if (forgotEmail && forgotForm) {
+          forgotEmail.setAttribute('form', forgotForm.id || 'forgotForm');
+        }
+      } catch (e) { /* ignore */ }
+    } catch (e) { /* ignore */ }
+
+    // If the static form exists but some ids differ, try to find inside the container
+    if (!forgotContainer && forgotForm) forgotContainer = forgotForm.parentElement;
+    if (!forgotForm && forgotContainer) forgotForm = forgotContainer.querySelector('form') || null;
+    if (!forgotEmail && forgotForm) forgotEmail = forgotForm.querySelector('input[type="email"]') || null;
+    if (!forgotSendBtn && forgotForm) forgotSendBtn = forgotForm.querySelector('button[type="submit"], button') || null;
+    if (!forgotEmailError && forgotContainer) forgotEmailError = forgotContainer.querySelector('.error-msg') || null;
+    if (!forgotMsg && forgotContainer) forgotMsg = forgotContainer.querySelector('#forgotMsg') || null;
+    if (!forgotBtnText && forgotSendBtn) forgotBtnText = forgotSendBtn.querySelector('span') || null;
+    if (!forgotSpinner && forgotContainer) forgotSpinner = forgotContainer.querySelector('.spinner') || null;
+
+    if (!forgot || !forgotContainer || !forgotForm || !forgotEmail || !forgotSendBtn) {
+      console.warn('[initLogin] forgot UI not fully present, will create dynamic UI');
+
+      // If there's no link to attach to, abort
+      if (!forgot) return;
+
+      // Build the same structure used by the static HTML so wiring below works unchanged
+      try {
+        const container = document.createElement('div');
+        container.id = 'forgotContainer';
+  container.style.display = 'none';
+        container.style.marginTop = '1rem';
+
+        const formEl = document.createElement('form');
+        formEl.id = 'forgotForm';
+        formEl.autocomplete = 'off';
+        formEl.style.margin = '0';
+
+        const row = document.createElement('div');
+        row.className = 'row center-row';
+
+        const label = document.createElement('label');
+        label.setAttribute('for', 'forgotEmail');
+        label.style.color = '#fff';
+        label.style.fontSize = '0.95rem';
+        label.textContent = 'Recuperar contraseña';
+
+        const inputWrap = document.createElement('div');
+        inputWrap.className = 'input-wrap';
+
+        const input = document.createElement('input');
+        input.id = 'forgotEmail';
+        input.name = 'forgotEmail';
+        input.type = 'email';
+        input.placeholder = 'Ingresa tu correo electrónico';
+        input.required = true;
+        input.style.background = '#fff';
+        input.style.color = '#222';
+
+        inputWrap.appendChild(input);
+
+        const errDiv = document.createElement('div');
+        errDiv.id = 'forgotEmailError';
+        errDiv.className = 'error-msg';
+
+        row.appendChild(label);
+        row.appendChild(inputWrap);
+        row.appendChild(errDiv);
+
+        const row2 = document.createElement('div');
+        row2.className = 'row center-row';
+
+        const btn = document.createElement('button');
+        btn.id = 'forgotSendBtn';
+        btn.type = 'submit';
+        btn.className = 'btn';
+        btn.style.width = '100%';
+        btn.style.background = '#2563eb';
+        btn.style.marginTop = '0.5rem';
+
+        const spanText = document.createElement('span');
+        spanText.id = 'forgotBtnText';
+        spanText.textContent = 'Enviar instrucciones';
+
+        const spanSpinner = document.createElement('span');
+        spanSpinner.id = 'forgotSpinner';
+        spanSpinner.className = 'spinner';
+        spanSpinner.style.display = 'none';
+
+        btn.appendChild(spanText);
+        btn.appendChild(spanSpinner);
+        row2.appendChild(btn);
+
+        const msgDiv = document.createElement('div');
+        msgDiv.id = 'forgotMsg';
+        msgDiv.style.textAlign = 'center';
+        msgDiv.style.marginTop = '0.5rem';
+        msgDiv.style.color = 'var(--success-color)';
+
+        formEl.appendChild(row);
+        formEl.appendChild(row2);
+        formEl.appendChild(msgDiv);
+
+        container.appendChild(formEl);
+
+        // Insert after the forgot link container
+        forgot.parentElement?.appendChild(container);
+
+        // Re-assign variables so wiring below uses the created nodes
+        forgotContainer = container;
+        forgotForm = formEl;
+        forgotEmail = input;
+        forgotEmailError = errDiv;
+        forgotSendBtn = btn;
+        forgotBtnText = spanText;
+        forgotSpinner = spanSpinner;
+        forgotMsg = msgDiv;
+      } catch (e) {
+        console.error('[initLogin] failed to create forgot UI', e);
+        return;
+      }
+    }
+
+    // Ensure hidden at init and disable the input so it doesn't block login form validation
+    try {
+      if (forgotContainer) forgotContainer.style.display = 'none';
+      if (forgotEmail) forgotEmail.disabled = true;
+    } catch (e) {}
+
+    // Toggle visibility using computed style to avoid mismatches
+    forgot.addEventListener('click', (ev) => {
+      ev.preventDefault();
+      const cs = window.getComputedStyle(forgotContainer);
+      const hidden = cs.display === 'none' || forgotContainer.style.display === 'none' || forgotContainer.style.display === '';
+      forgotContainer.style.display = hidden ? 'block' : 'none';
+      if (hidden) {
+        // enable and focus input when showing
+        try { forgotEmail.disabled = false; } catch (e) {}
+        setTimeout(() => { try { forgotEmail.focus(); } catch (e) {} }, 50);
+      } else {
+        try { forgotEmail.disabled = true; } catch (e) {}
+      }
+      if (forgotMsg) forgotMsg.textContent = '';
+      if (forgotEmail) { forgotEmail.value = ''; }
+      if (forgotEmailError) forgotEmailError.textContent = '';
+    });
+
+    // Basic email validation
+    function validEmail(v) { return !!v && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v); }
+
+    function updateState() {
+      const v = String(forgotEmail.value || '').trim();
+      try { forgotSendBtn.disabled = !validEmail(v); } catch (e) {}
+      if (forgotEmailError) forgotEmailError.textContent = '';
+      if (forgotMsg) forgotMsg.textContent = '';
+    }
+
+    // wire input
+    forgotEmail.addEventListener('input', updateState);
+    updateState();
+
+    // If the button is of type submit inside the form, better listen to form submit
+    if (forgotForm) {
+      forgotForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const emailVal = String(forgotEmail.value || '').trim();
+        if (!validEmail(emailVal)) {
+          if (forgotEmailError) forgotEmailError.textContent = 'Correo inválido';
+          return;
+        }
+        // UI feedback
+        try { forgotSendBtn.disabled = true; } catch (e) {}
+        const origText = (forgotBtnText && forgotBtnText.textContent) || forgotSendBtn.textContent;
+        if (forgotBtnText) forgotBtnText.textContent = 'Enviando...'; else forgotSendBtn.textContent = 'Enviando...';
+        if (forgotSpinner) forgotSpinner.style.display = 'inline-block';
+        if (forgotEmailError) forgotEmailError.textContent = '';
+        if (forgotMsg) forgotMsg.textContent = '';
+
+        try {
+          // Save the email used to request reset so the reset page can try auto-login if needed
+          try { localStorage.setItem('lastResetEmail', emailVal); } catch (e) { /* ignore */ }
+          const base = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+          const url = `${base.replace(/\/$/, '')}/api/v1/auth/forgot-password`;
+          const resp = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email: emailVal })
+          });
+          if (resp.ok) {
+            let body = {};
+            try { body = await resp.json(); } catch (e) { body = {}; }
+            const token = body && body.token ? String(body.token) : null;
+            if (token) {
+              window.location.hash = `#/reset-password?token=${encodeURIComponent(token)}`;
+              return;
+            }
+            if (forgotMsg) {
+              forgotMsg.style.color = 'var(--success-color)';
+              forgotMsg.textContent = 'Si existe una cuenta con ese correo, recibirás instrucciones por correo.';
+            } else {
+              showMessage('Si existe una cuenta con ese correo, recibirás instrucciones por correo.', 'info');
+            }
+          } else {
+            let txt = '';
+            try { const j = await resp.json(); txt = j.message || j.error || JSON.stringify(j); } catch (e) { txt = await resp.text().catch(() => ''); }
+            if (forgotEmailError) {
+              forgotEmailError.textContent = `No se pudo procesar la solicitud: ${resp.status} ${txt}`;
+            } else {
+              showMessage(`No se pudo procesar la solicitud: ${resp.status} ${txt}`, 'error');
+            }
+          }
+        } catch (err) {
+          console.error('forgot-password error', err);
+          if (forgotEmailError) forgotEmailError.textContent = 'Error de red. Intenta de nuevo más tarde.';
+        } finally {
+          try { forgotSendBtn.disabled = false; } catch (e) {}
+          if (forgotBtnText) forgotBtnText.textContent = origText || 'Enviar instrucciones'; else forgotSendBtn.textContent = origText || 'Enviar instrucciones';
+          if (forgotSpinner) forgotSpinner.style.display = 'none';
+        }
+      });
+    }
+  })();
 }
