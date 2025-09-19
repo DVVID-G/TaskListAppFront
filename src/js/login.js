@@ -1,3 +1,6 @@
+// Compatibility stub: some build systems have cached imports using the capitalized 'Login.js'.
+// Re-export the canonical lowercase module to avoid case-sensitive import errors.
+export * from './login.js';
 export function initLogin() {
   console.log('[initLogin] initializing login form');
   const form = document.getElementById('loginForm');
