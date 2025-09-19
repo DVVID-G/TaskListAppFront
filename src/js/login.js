@@ -1,5 +1,5 @@
-// Compatibility stub: some build systems have cached imports using the capitalized 'Login.js'.
-// Re-export the canonical lowercase module to avoid case-sensitive import errors.
+// Compatibility stub: some build systems or older imports may reference 'Login.js' (capital L).
+// Re-export from the canonical lowercase module so both import paths resolve to the same implementation.
 export * from './login.js';
 export function initLogin() {
   console.log('[initLogin] initializing login form');

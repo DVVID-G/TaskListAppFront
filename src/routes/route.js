@@ -1,6 +1,8 @@
 import { registerUser, loginUser } from '../services/userService.js';
 
 const app = document.getElementById('app');
+// Ensure task action global handlers are bound only once
+let taskMenuHandlersBound = false;
 
 /**
  * Build a safe URL for fetching view fragments inside Vite (dev and build).
@@ -103,6 +105,11 @@ async function loadView(name) {
       module.initCreateTask();
     });
   }
+  if (name === 'editTask') {
+    import('../js/editTask.js').then(module => {
+      try { module.initEditTask && module.initEditTask(); } catch (e) { console.error('initEditTask error', e); }
+    }).catch(err => console.error('Could not load editTask module', err));
+  }
 }
 
 /**
@@ -123,7 +130,7 @@ function handleRoute() {
   // Example: '#/reset-password?token=...' -> 'reset-password'
   const raw = location.hash.startsWith('#/') ? location.hash.slice(2) : '';
   const path = raw ? raw.split('?')[0] : 'home';
-  const known = ['home', 'board', 'signup', 'createTask', 'reset-password', 'profile'];
+  const known = ['home', 'board', 'signup', 'createTask', 'editTask', 'reset-password', 'profile'];
   const route = known.includes(path) ? path : 'home';
 
   loadView(route).catch(err => {
@@ -242,6 +249,19 @@ async function initBoard() {
           <div>${escapeHtml(task.description || '')}</div>
         </div>
         <div class="meta">${escapeHtml(uiStatus || '')}</div>
+        <button class="task-actions-btn" aria-haspopup="true" aria-expanded="false" title="Acciones" draggable="false" tabindex="0">
+          <svg draggable="false" width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <circle cx="5" cy="12" r="1.8" fill="currentColor" />
+            <circle cx="12" cy="12" r="1.8" fill="currentColor" />
+            <circle cx="19" cy="12" r="1.8" fill="currentColor" />
+          </svg>
+        </button>
+        <div class="task-action-menu" role="menu" aria-hidden="true">
+          <ul>
+            <li role="menuitem"><a href="#" class="action-edit"><svg class="menu-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25z" fill="currentColor"/><path d="M20.71 7.04a1 1 0 000-1.41l-2.34-2.34a1 1 0 00-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" fill="currentColor"/></svg>Editar tarea</a></li>
+            <li role="menuitem"><a href="#" class="action-delete"><svg class="menu-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 7h12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M10 11v6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M14 11v6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M19 7l-1 12a2 2 0 01-2 2H8a2 2 0 01-2-2L5 7" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Eliminar tarea</a></li>
+          </ul>
+        </div>
       `;
       if (uiStatus === 'Por hacer') todoList.appendChild(li);
       else if (uiStatus === 'En progreso') progressList.appendChild(li);
@@ -375,6 +395,109 @@ async function initBoard() {
         if (dz) dz.style.display = 'none';
       };
     });
+
+      // Bind global handlers for task action menus only once
+      if (!taskMenuHandlersBound) {
+        taskMenuHandlersBound = true;
+
+        // Prevent drag from starting when interacting with actions button/menu
+        document.addEventListener('pointerdown', function onTaskActionPointerDown(e) {
+          const target = e && e.target;
+          if (!(target && target.closest)) return;
+          const isAction = target.closest('.task-actions-btn') || target.closest('.task-action-menu');
+          if (!isAction) return;
+          try { e.stopPropagation(); } catch (err) {}
+          try { e.preventDefault(); } catch (err) {}
+
+          const btn = target.closest('.task-actions-btn');
+          const li = btn ? btn.closest('.todo') : (target.closest('.task-action-menu') && target.closest('.todo'));
+          if (!li) return;
+
+          try { li.__prevDraggable = li.draggable; } catch (err) { /* ignore */ }
+          try { li.draggable = false; } catch (err) { /* ignore */ }
+          try { li.dataset._dragDisabled = '1'; } catch (err) { /* ignore */ }
+
+          const restore = () => {
+            try {
+              li.draggable = (typeof li.__prevDraggable !== 'undefined') ? li.__prevDraggable : true;
+            } catch (err) { /* ignore */ }
+            try { delete li.__prevDraggable; } catch (err) { /* ignore */ }
+            try { delete li.dataset._dragDisabled; } catch (err) { /* ignore */ }
+            window.removeEventListener('pointerup', restore);
+            window.removeEventListener('pointercancel', restore);
+          };
+
+          window.addEventListener('pointerup', restore);
+          window.addEventListener('pointercancel', restore);
+        });
+
+        // Event delegation: open per-task action menu and handle edit/delete
+        document.addEventListener('click', function onTaskActionClick(e) {
+          const target = e && e.target;
+          if (!(target && target.closest)) return;
+
+          const isBtn = !!target.closest('.task-actions-btn');
+          const isMenu = !!target.closest('.task-action-menu');
+
+          // Close any open menus when clicking outside
+          if (!isBtn && !isMenu) {
+            document.querySelectorAll('.task-action-menu.show').forEach(m => {
+              m.classList.remove('show');
+              m.setAttribute('aria-hidden', 'true');
+            });
+          }
+
+          // Toggle menu when clicking the actions button
+          if (isBtn) {
+            e.stopPropagation();
+            const btn = target.closest('.task-actions-btn');
+            const container = btn && btn.closest('.todo');
+            const menu = container && container.querySelector('.task-action-menu');
+            if (menu) {
+              const isOpen = menu.classList.toggle('show');
+              menu.setAttribute('aria-hidden', isOpen ? 'false' : 'true');
+              btn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+            }
+            return;
+          }
+
+          // Edit action
+          const edit = target.closest('.action-edit');
+          if (edit) {
+            e.preventDefault();
+            const li = edit.closest('.todo');
+            const tid = li && li.dataset && li.dataset.id;
+            if (tid) location.hash = '#/editTask?id=' + encodeURIComponent(tid);
+            return;
+          }
+
+          // Delete action
+          const del = target.closest('.action-delete');
+          if (del) {
+            e.preventDefault();
+            const li = del.closest('.todo');
+            const tid = li && li.dataset && li.dataset.id;
+            if (!tid) return showServerDebug(400, 'ID de tarea inválido para eliminar');
+            if (!confirm('¿Eliminar esta tarea? Esta acción no se puede deshacer.')) return;
+            (async () => {
+              try {
+                const delUrl = `${base.replace(/\/$/, '')}/api/v1/tasks/${tid}`;
+                const delRes = await fetch(delUrl, { method: 'DELETE', headers: { ...(token && { 'Authorization': `Bearer ${token}` }) } });
+                const delBody = await delRes.text().catch(() => '');
+                if (!delRes.ok) {
+                  showServerDebug(delRes.status, delBody || 'Sin cuerpo de respuesta');
+                  throw new Error('No se pudo eliminar la tarea');
+                }
+                // remove element from DOM immediately for snappy UX
+                li.remove();
+              } catch (err) {
+                showServerDebug(500, err.message || String(err));
+              }
+            })();
+            return;
+          }
+        });
+      }
 
     // Delete zone handlers
     const deleteZone = document.getElementById('deleteZone');
