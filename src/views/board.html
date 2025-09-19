@@ -1,3 +1,18 @@
+<style>
+/* Avatar menu styles (moved to head by the SPA router) */
+.avatar-menu { display: none; position: absolute; right: 0; top: calc(100% + 8px); background: linear-gradient(180deg,#0b1220,#0f1724); color: #e6eefc; border-radius: 12px; padding: 6px; min-width: 220px; box-shadow: 0 12px 40px rgba(2,6,23,0.7); z-index:50; transform-origin: top right; transition: transform 140ms ease, opacity 140ms ease; opacity:0; transform: translateY(-6px) scale(0.98); }
+.avatar-menu.show { display: block; opacity:1; transform: translateY(0) scale(1); }
+.avatar-menu ul { list-style: none; margin: 0; padding: 6px; }
+.avatar-menu li { margin: 0; padding: 6px 8px; border-radius: 8px; }
+.avatar-menu a { display:flex; align-items:center; gap:10px; color:inherit; text-decoration:none; padding:8px 6px; transition: background 120ms ease, color 120ms ease; }
+.avatar-menu li:hover { background: rgba(143,179,255,0.06); }
+.menu-icon { width:20px; height:20px; flex:0 0 20px; display:inline-flex; align-items:center; justify-content:center; color:#93c0ff; }
+.menu-item { font-size:0.95rem; }
+.avatar { width:40px; height:40px; border-radius:999px; object-fit:cover; box-shadow: 0 4px 10px rgba(2,6,23,0.25); }
+.menu-icon svg { display:block; width:100%; height:100%; }
+.avatar-menu a:focus, .avatar-menu a:hover { color: #dbeefe; }
+</style>
+
 <header class="app-header" style="position:relative; min-height:96px; padding:0.5rem 1rem;">
   <!-- left placeholder to keep spacing -->
   <div class="app-left" style="min-width:64px;"></div>
@@ -10,13 +25,44 @@
   </div>
 
   <div class="app-right" style="display:flex; align-items:center; height:100%;">
-    <div id="userArea" class="user-area" style="display:flex; align-items:center; gap:0.5rem;">
-      <img id="avatarBtn" class="avatar" src="/user.svg" alt="avatar">
+    <div id="userArea" class="user-area" style="display:flex; align-items:center; gap:0.5rem; position:relative;">
+      <img id="avatarBtn" class="avatar" src="/user.svg" alt="avatar" role="button" aria-haspopup="true" aria-expanded="false">
       <div id="avatarMenu" class="avatar-menu" aria-hidden="true">
         <ul>
-          <li><a id="viewProfileLink" href="#/profile">Ver perfil</a></li>
-          <li><a href="#">Configuraci\u00f3n</a></li>
-          <li><a href="#">Cerrar sesi\u00f3n</a></li>
+          <li>
+            <a id="viewProfileLink" href="#/profile">
+              <span class="menu-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M12 12a4 4 0 100-8 4 4 0 000 8z" fill="currentColor" opacity="0.95"/>
+                  <path d="M3 20a9 9 0 0118 0" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" opacity="0.9"/>
+                </svg>
+              </span>
+              <span class="menu-item">Ver perfil</span>
+            </a>
+          </li>
+          <li>
+            <a href="#">
+              <span class="menu-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <rect x="3" y="4" width="18" height="14" rx="2" fill="currentColor" opacity="0.06"/>
+                  <path d="M7 8h10M7 12h6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </span>
+              <span class="menu-item">Sobre nosotros</span>
+            </a>
+          </li>
+          <li>
+            <a href="#" id="logoutLink">
+              <span class="menu-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M9 21H6a2 2 0 01-2-2V5a2 2 0 012-2h3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M16 17l4-5-4-5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M21 12H9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </span>
+              <span class="menu-item">Cerrar sesión</span>
+            </a>
+          </li>
         </ul>
       </div>
     </div>
