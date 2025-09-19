@@ -1,24 +1,28 @@
 :root {
-    --primary-color: #1abc9c;       /* Verde agua para botones */
-    --secondary-color: #16a085;     /* Verde más oscuro para hover */
+    --primary-color: #3B82F6;       /* Verde agua para botones */
+    --secondary-color: #3B82F6;     /* Verde más oscuro para hover */
     --background-color: #121212;    /* Fondo muy oscuro */
     --card-background: #1e1e1e;     /* Tarjeta ligeramente más clara */
     --text-color: #ecf0f1;          /* Texto claro */
     --border-color: #34495e;        /* Bordes elegantes */
     --error-color: #e74c3c;         /* Rojo para errores */
-    --success-color: #2ecc71;       /* Verde para éxito */
+    --success-color: #3B82F6;       /* Verde para éxito */
     --font-family: 'Open Sans', sans-serif;
 }
 
 body {
     font-family: var(--font-family);
-    background: radial-gradient(ellipse at bottom, #5b0d6a 0%, #2b0b3a 40%, #0e0b14 100%);
+    background: #F5F9FF;
     color: var(--text-color);
     margin: 0;
     padding: 0;
     min-height: 100vh;
-}
 
+}
+html{
+  height: 100%;
+  margin: 0;
+}
 .container {
     width: 100%;
     max-width: 400px;
@@ -38,32 +42,37 @@ body {
 
 /* Centered login page */
 .login-page {
-    min-height: calc(100vh - 80px);
+    min-height: 100vh;
     display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 2rem;
+    flex-direction: column; /* coloca logo arriba y tarjeta abajo en columna */
+    align-items: center;    /* centra horizontalmente */
+    justify-content: flex-start; /* evita el centrado vertical */
+    padding: 2rem 1rem;
+    margin-top: 0;
 }
 
 .login-card {
     width: 100%;
     max-width: 380px;
-    background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.03));
+    background: #1E3A5F;
     border: 1px solid rgba(255,255,255,0.06);
     backdrop-filter: blur(8px);
     border-radius: 12px;
     padding: 1.5rem;
     box-shadow: 0 8px 30px rgba(2,6,23,0.6);
     color: #fff;
+    margin-top: 0;
 }
 
 .login-card h2 {
     margin: 0 0 1rem 0;
     font-size: 1.25rem;
     text-align: center;
+    margin-top: 0;
 }
 
 .login-card .row {
+    margin-top: 0;
     margin-bottom: 0.75rem;
 }
 
@@ -81,12 +90,15 @@ body {
     padding: 0.6rem 0.75rem;
     border-radius: 8px;
     border: 1px solid rgba(255,255,255,0.08);
-    background: rgba(255,255,255,0.03);
-    color: #fff;
+    background: #fff;
+    color:  #6B7280;
     outline: none;
 }
 
-.input-wrap { position: relative; }
+.input-wrap {
+    position: relative;
+}
+
 .input-wrap .toggle-pass {
     position: absolute;
     right: 6px;
@@ -99,17 +111,24 @@ body {
     border-radius: 6px;
     cursor: pointer;
     font-size: 0.85rem;
+    background-color: #D1D5DB;
 }
-.input-wrap .toggle-pass:focus { box-shadow: 0 0 0 3px rgba(37,99,235,0.14); }
 
-.login-card input::placeholder { color: rgba(255,255,255,0.45); }
+.input-wrap .toggle-pass:focus {
+    box-shadow: 0 0 0 3px rgba(37,99,235,0.14);
+}
+
 .login-card input:focus {
     border-color: rgba(37,99,235,0.9);
     box-shadow: 0 6px 18px rgba(37,99,235,0.06), 0 0 0 4px rgba(37,99,235,0.06);
 }
 
 /* Ensure inputs inside input-wrap match the visual size of plain inputs */
-.input-wrap { width: 100%; position: relative; }
+.input-wrap {
+    width: 100%;
+    position: relative;
+}
+
 .input-wrap input {
     box-sizing: border-box;
     width: 100%;
@@ -128,16 +147,18 @@ body {
     -moz-appearance: textfield; /* Firefox */
     appearance: textfield;
 }
+
 .input-wrap input[type='number']::-webkit-outer-spin-button,
 .input-wrap input[type='number']::-webkit-inner-spin-button {
     -webkit-appearance: none;
     margin: 0;
 }
+
 .input-wrap input[type='number'] {
     padding-right: 1rem; /* no toggle, keep padding */
-    background: rgba(255,255,255,0.03); /* match text/password inputs */
+    background: #fff; /* match text/password inputs */
     border: 1px solid rgba(255,255,255,0.08);
-    color: #fff;
+    color: #6B7280;
 }
 
 /* Make toggle button visually small and not affect input height */
@@ -157,16 +178,173 @@ body {
     color: var(--primary-color);
 }
 
+/* Volver al login desde el register */
+.back-to-login {
+    text-align: center;   /* ✅ centrado */
+    margin-top: 1rem;
+    font-size: 0.9rem;
+    color: #E5E7EB;       /* gris claro para el texto */
+}
+
+.back-to-login .link {
+    color: #3B82F6;       /* azul medio */
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.3s ease;
+}
+
+.back-to-login .link:hover {
+    color: #60A5FA;       /* azul más claro al hover */
+    text-decoration: underline;
+}
+
+.back-to-login a:visited {
+    color: #3B82F6; /* evita el morado */
+}
+/*Contenedor registro*/
+/* Registro específico */
+#registerPage {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+    padding: 2rem 1rem;
+}
+
+/* Contenedor de registro más ancho y compacto */
+#registerPage .login-card {
+    max-width: 380px;
+    width: 100%;
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    box-shadow: 0 8px 30px rgba(2, 6, 23, 0.3);
+    border-radius: 12px;
+    background: #1E3A5F;
+}
+
+/* Agrupar nombre y apellido en la misma fila */
+#registerPage .row-inline {
+    display: flex;
+    gap: 1rem;
+    justify-content: space-between;
+}
+
+#registerPage .row-inline .input-wrap {
+    flex: 1;
+}
+
+
+/* Contraseña y confirmación en la misma fila si quieres */
+#registerPage .row-pass-inline {
+    display: flex;
+    gap: 1rem;
+}
+
+#registerPage .row-pass-inline .input-wrap {
+    flex: 1;
+}
+
+/* Inputs más cómodos y compactos */
+#registerPage input {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.95rem;
+    border-radius: 8px;
+    border: 1px solid rgba(255,255,255,0.08);
+    background: #fff;
+    color: #111;
+}
+
+/* Botón de registro ancho y centrado */
+#registerPage .btn {
+    width: 100%;
+    padding: 12px;
+    font-size: 1rem;
+    border-radius: 8px;
+}
+
+/* Logo centrado */
+#registerPage .logo {
+    max-width: 300px;
+    margin-bottom: 1rem;
+}
+
+/* Mensajes de error */
+#registerPage .error-msg {
+    font-size: 0.8rem;
+    color: #ff4d4f;
+}
+
+/* Responsive: en móviles, todas las filas vuelven a columna */
+@media (max-width: 480px) {
+    #registerPage .row-inline,
+    #registerPage .row-pass-inline {
+        flex-direction: column;
+    }
+
+    #registerPage input#age {
+        max-width: 100%;
+    }
+}
+
+/* Logo de la pagina */
+.logo {
+    max-width: 380px;
+    max-height:150px;  /* Tamaño máximo en pantallas grandes */
+    width: 100%;       /* Ocupará todo el ancho disponible hasta el max */
+    height: auto;      /* Mantiene proporción */
+    display: block;    /* Evita márgenes raros */
+    margin: 0 auto;    /* Lo centra horizontalmente */
+    padding: 0;
+    overflow: hidden;
+}
+
+header {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 0px; /* ajusta separación con la tarjeta */
+}
+
+header .logo {
+    max-width: 380px;  /* tamaño controlado y responsive */
+    width: 100%;
+    height: auto;
+}
+
 /* Center labels and inputs horizontally inside login rows */
-.center-row { display:flex; flex-direction:column; align-items:center; }
-.center-row label { text-align:center; width:100%; }
-.center-row input { max-width: 320px; }
-/* Ensure the input wrapper itself is centered and constrained so the toggle aligns inside the field */
-.center-row .input-wrap { max-width: 320px; width: 100%; margin: 0 auto; }
+.center-row {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.center-row label {
+    text-align: center;
+    width: 100%;
+}
+
+.center-row input {
+    max-width: 320px;
+}
+
+.center-row .input-wrap {
+    max-width: 320px;
+    width: 100%;
+    margin: 0 auto;
+}
 
 /* Forgot password link style */
-#forgotPassword { color: var(--primary-color); text-decoration: none; }
-#forgotPassword:hover { text-decoration: underline; color: var(--secondary-color); }
+#forgotPassword {
+    color: var(--primary-color);
+    text-decoration: none;
+}
+
+#forgotPassword:hover {
+    text-decoration: underline;
+    color: var(--secondary-color);
+}
 
 .btn {
     display: inline-flex;
@@ -192,10 +370,17 @@ body {
     animation: spin 0.8s linear infinite;
 }
 
-.error-msg { font-size: 0.8rem; color: #ffb4b4; min-height: 1rem; }
+.error-msg {
+    font-size: 0.8rem;
+    color: #ffb4b4;
+    min-height: 1rem;
+}
 
-@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
 
+/* Toolbar */
 .toolbar {
     margin-bottom: 20px;
 }
@@ -209,6 +394,15 @@ body {
 
 .toolbar .link:hover {
     color: var(--primary-color);
+}
+
+/* Input placeholders */
+.login-card input[type="text"]::placeholder,
+.login-card input[type="password"]::placeholder,
+.login-card input[type="email"]::placeholder,
+.input-wrap input[type='number']::placeholder {
+    color: #6B7280;
+    opacity: 1;
 }
 
 h1 {
@@ -253,7 +447,7 @@ h1 {
 .btn {
     width: 100%;
     padding: 12px;
-    background-color: var(--primary-color);
+    background-color: #3B82F6;
     color: var(--text-color);
     border: none;
     border-radius: 8px;
@@ -266,11 +460,11 @@ h1 {
 }
 
 .btn:hover {
-    background-color: var(--secondary-color);
+    background-color: #3B82F6;
 }
 
 .btn:disabled {
-    background-color: #16a08599; /* versión más clara y transparente */
+    background-color: #3B82F6; /* versión más clara y transparente */
     cursor: not-allowed;
 }
 
@@ -284,11 +478,6 @@ h1 {
     animation: spin 0.8s linear infinite;
 }
 
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
-
 #registerMsg {
     text-align: center;
     margin-top: 15px;
@@ -296,6 +485,7 @@ h1 {
     color: var(--success-color);
 }
 
+/* Media queries */
 @media (max-width: 480px) {
     .card {
         padding: 20px;
@@ -305,43 +495,197 @@ h1 {
         font-size: 0.95rem;
     }
 }
-
+/*Taskcard*/
+#taskContainer .container{
+    background:#1E3A5F;
+}
 /* Top app header */
 .app-header {
+    display: flex;
+    justify-content: space-between; /* deja logo a la izquierda y user a la derecha */
+    align-items: center;
+    padding: 18px 36px;
+    position: relative;
+    border-bottom: 2px solid #3B82F6;        /* línea azul en el bottom */
+    box-shadow: 0 2px 6px rgba(59,130,246,0.15); /* sombra muy sutil */
+    background-color: inherit; /* mantiene el color actual del header */
+    z-index: 10;
+    flex-wrap: wrap; /* permite que los elementos bajen de línea si no caben */
+}
+.app-brand {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex-shrink: 0; /* evita que el logo se encoja demasiado */
+}
+
+/* Logo responsive */
+.app-brand .logo {
+    max-width: 380px;
+    height: auto;
+}
+
+/* Subtitle centrado */
+
+/* Mantener la derecha con avatar */
+.app-right {
+    position: absolute;
+    right: 36px;
+    display: flex;
+    align-items: center;
+     flex-shrink: 0; 
+}
+.app-left { 
+    display:flex;
+    align-items:center;
+    gap:16px;
+}
+
+.app-brand .logo {
+    font-weight:700;
+    font-size:1.2rem;
+    color: #fff;
+}
+
+.app-brand .subtitle {
+    font-size:0.85rem;
+    color: rgba(255,255,255,0.85);
+}
+/* Ajuste en pantallas pequeñas */
+@media (max-width: 600px) {
+    .app-header {
+        flex-direction: column; /* logo y usuario apilados */
+        align-items: center;    /* centrado horizontal */
+    }
+    .app-right {
+        margin-top: 8px;        /* separación entre logo y avatar */
+    }
+    .app-brand .logo {
+        max-width: 120px;
+    }
+}
+.new-task-btn {
+    position: absolute;
+    bottom: 8px;               /* abajo */
+    right: 8px;                /* a la derecha */
+    width: 28px;               /* círculo compacto */
+    height: 28px;
+    border-radius: 50%;
+    background-color: #7ED321; /* verde claro */
+    color: #fff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.4rem;          /* + destacado */
+    text-decoration: none;
+    border: none;
+    outline: none;
+    box-shadow: none;
+    cursor: pointer;
+    transition: background 0.3s, transform 0.2s;
+    z-index: 1;
+}
+.new-task-btn:hover {
+    background-color: #a3e048;   /* verde más claro al pasar el mouse */
+    transform: scale(1.1);       /* pequeño efecto de “pop” */
+}
+
+.user-area {
+    position:relative;
+}
+
+.avatar {
+    width:44px;
+    height:44px;
+    border-radius:50%;
+    cursor:pointer;
+    border:2px solid rgba(255,255,255,0.08);
+}
+
+.avatar-menu {
+    position:absolute;
+    right:0;
+    top:54px;
+    background:#0f1720;
+    color:#fff;
+    border-radius:8px;
+    box-shadow:0 8px 20px rgba(0,0,0,0.5);
+    padding:8px;
+    display:none;
+    min-width:160px;
+}
+
+.avatar-menu ul {
+    list-style:none;
+    margin:0;
+    padding:0;
+}
+
+.avatar-menu li {
+    padding:8px 12px;
+}
+
+.avatar-menu li a {
+    color:#ddd;
+    text-decoration:none;
+}
+
+.avatar-menu li:hover {
+    background: rgba(255,255,255,0.02);
+}
+
+.avatar-menu.show {
+    display:block;
+}
+
+/* Kanban layout tweaks */
+.kanban-main {
+    padding: 18px 36px;
+}
+
+.kanban-board {
+    display:flex;
+    gap:24px;
+    align-items:flex-start;
+}
+
+.kanban-column {
+    background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));
+    padding:18px;
+    border-radius:12px;
+    min-height:420px;
+    border:1px solid rgba(255,255,255,0.04);
+}
+
+.kanban-title {
+    color:#fff;
+    text-align:center;
+    margin-bottom:14px;
+    opacity:0.95;
+}
+
+.todo {
+    background: linear-gradient(180deg,#ffffff 0%,#f7f7fb 100%);
+    color:#111;
+    padding:14px;
+    border-radius:10px;
+    margin-bottom:10px;
+}
+
+.meta {
+    font-size:0.8rem;
+    color:#666;
+    margin-top:8px;
     display:flex;
     justify-content:space-between;
     align-items:center;
-    padding: 18px 36px;
-    gap:12px;
 }
 
-.app-left { display:flex; align-items:center; gap:16px; }
-.app-brand .logo { font-weight:700; font-size:1.2rem; color: #fff; }
-.app-brand .subtitle { font-size:0.85rem; color: rgba(255,255,255,0.85); }
-.new-task-btn { width:auto; padding:10px 18px; border-radius:20px; }
-
-.user-area { position:relative; }
-.avatar { width:44px; height:44px; border-radius:50%; cursor:pointer; border:2px solid rgba(255,255,255,0.08); }
-.avatar-menu { position:absolute; right:0; top:54px; background:#0f1720; color:#fff; border-radius:8px; box-shadow:0 8px 20px rgba(0,0,0,0.5); padding:8px; display:none; min-width:160px; }
-.avatar-menu ul { list-style:none; margin:0; padding:0; }
-.avatar-menu li { padding:8px 12px; }
-.avatar-menu li a { color:#ddd; text-decoration:none; }
-.avatar-menu li:hover { background: rgba(255,255,255,0.02); }
-.avatar-menu.show { display:block; }
-
-/* Kanban layout tweaks */
-.kanban-main { padding: 18px 36px; }
-.kanban-board { display:flex; gap:24px; align-items:flex-start; }
-.kanban-column { background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01)); padding:18px; border-radius:12px; min-height:420px; border:1px solid rgba(255,255,255,0.04); }
-.kanban-title { color:#fff; text-align:center; margin-bottom:14px; opacity:0.95; }
-
-.todo { background: linear-gradient(180deg,#ffffff 0%,#f7f7fb 100%); color:#111; padding:14px; border-radius:10px; margin-bottom:10px; }
-.meta { font-size:0.8rem; color:#666; margin-top:8px; display:flex; justify-content:space-between; align-items:center; }
-
-.delete-zone { position:fixed; left:50%; transform:translateX(-50%); bottom:28px; }
-.delete-btn { background:#ff4d4f; color:#fff; border:none; padding:12px 18px; border-radius:14px; box-shadow:0 8px 20px rgba(0,0,0,0.25); }
-
-@media (max-width: 900px) { .kanban-board { flex-direction:column; } }
+@media (max-width: 900px) {
+    .kanban-board {
+        flex-direction:column;
+    }
+}
 
 /* Kanban board styles */
 .kanban-container {
@@ -355,21 +699,69 @@ h1 {
     justify-content:space-between;
     align-items:center;
     gap:1rem;
-    margin-bottom:1rem;
+    margin-bottom:0;
 }
 
 .kanban-header h1 {
-    margin:0;
+    margin:0 auto;
     font-size:1.8rem;
     color:var(--text-color);
 }
 
+/* Colores por estatus de la tarea */
+.kanban-column[data-status="Por hacer"] {
+    background: #2F6DB2; /* Azul más intenso */
+    color: #fff;
+    position: relative;
+}
+
+.kanban-column[data-status="En progreso"] {
+    background: #D98200; /* Naranja más oscuro */
+    color: #fff;
+}
+
+.kanban-column[data-status="Completada"] {
+    background: #5C9E17; /* Verde más fuerte */
+    color: #fff;
+}
+/* Ajustes responsive del Kanban */
+@media (max-width: 900px) {
+    .kanban-board {
+        flex-direction: column;   /* columnas apiladas */
+        align-items: center;      /* centra horizontalmente las columnas */
+    }
+
+    .kanban-column {
+        width: 90%;               /* ocupa casi todo el ancho disponible */
+        max-width: 400px;         /* no se estire demasiado en tablet/móvil */
+        min-height: 300px;        /* altura mínima decente */
+        margin-bottom: 1rem;      /* separación entre columnas */
+    }
+}
+
+/* Pequeños móviles */
+@media (max-width: 480px) {
+    .kanban-column {
+        width: 95%;              
+        max-width: 360px;        
+        padding: 12px;           
+    }
+
+    .kanban-title {
+        font-size: 1rem;         
+    }
+
+    .todo {
+        padding: 10px;           
+    }
+}
 /* App title */
 .app-title {
     display:flex;
     justify-content:center;
     margin-bottom:0.6rem;
 }
+
 .app-name {
     border:4px solid var(--primary-color);
     padding:0.6rem 1.2rem;
@@ -438,31 +830,20 @@ h1 {
 .kanban-column.drag-over {
     outline: 3px dashed rgba(26, 188, 156, 0.35);
 }
-
-/* Delete zone */
-.delete-zone {
-    position: fixed;
-    left: 50%;
-    transform: translateX(-50%);
-    bottom: 30px;
-    width: 60%;
-    max-width: 720px;
-    background: #c0392b;
-    color: white;
-    text-align: center;
-    font-weight: 700;
-    padding: 18px 12px;
-    border-radius: 8px;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.5);
-    z-index: 9999;
-    font-size: 1.25rem;
-    letter-spacing: 2px;
+.task-wrapper{
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  min-height: 100vh !important;
+  width: 100% !important;
 }
-.delete-zone.drag-over {
-    background: #e74c3c;
-    transform: translateX(-50%) scale(1.03);
-}
+#taskContainer {
 
-@media (max-width: 800px) {
-    .kanban-board { flex-direction: column; }
+  background: #1E3A5F;
+  width: 600px;
+  max-width: 90%;     /* para que no se rompa en móviles */
+  padding: 20px;
+  border-radius: 8px;
+  color: #fff;        /* para que el texto sea legible */
+  margin: 0 auto;
 }
