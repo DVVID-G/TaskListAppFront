@@ -1,0 +1,27 @@
+/* Responsive logo styles used across views */
+:root {
+  --logo-desktop: 72px;
+  --logo-tablet: 56px;
+  --logo-mobile: 40px;
+}
+
+.app-brand { display:flex; align-items:center; justify-content:center; }
+.app-logo { display:block; height:var(--logo-mobile); width:auto; }
+
+/* Tablet and up */
+@media (min-width: 640px) {
+  .app-logo { height: var(--logo-tablet); }
+}
+
+/* Desktop */
+@media (min-width: 1024px) {
+  .app-logo { height: var(--logo-desktop); }
+}
+
+/* Utility to reduce logo on very small screens */
+@media (max-width: 360px) {
+  .app-logo { height: calc(var(--logo-mobile) * 0.85); }
+}
+
+/* Ensure logo in headers doesn't overlap other controls */
+.header-logo-wrapper { display:flex; align-items:center; justify-content:center; }

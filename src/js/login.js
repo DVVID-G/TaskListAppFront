@@ -141,14 +141,38 @@ export function initLogin() {
 
       const data = await res.json().catch(() => ({}));
 
-      if (res.ok) {
-        if (data.token) localStorage.setItem('token', data.token);
-        if (data.user && data.user._id) localStorage.setItem('userId', data.user._id);
-        showMessage('✅ Login exitoso', 'success');
-        setTimeout(() => (window.location.hash = '#/board'), 500);
+        if (res.ok) {
+          if (data.token) localStorage.setItem('token', data.token);
+          if (data.user && data.user._id) localStorage.setItem('userId', data.user._id);
+          showMessage('✅ Login exitoso', 'success');
+          // Prefer redirect saved in postLoginRedirect (if any)
+          setTimeout(() => {
+            try {
+              const target = localStorage.getItem('postLoginRedirect');
+              if (target) {
+                localStorage.removeItem('postLoginRedirect');
+                window.location.hash = target;
+                return;
+              }
+            } catch (e) { /* ignore */ }
+            window.location.hash = '#/board';
+          }, 500);
       } else {
         const msg = data.message || data.error || `Error ${res.status}`;
         showMessage(msg, 'error');
+          if (data?.token) localStorage.setItem('token', data.token);
+          msg.textContent = 'Login exitoso';
+          setTimeout(() => {
+            try {
+              const target = localStorage.getItem('postLoginRedirect');
+              if (target) {
+                localStorage.removeItem('postLoginRedirect');
+                location.hash = target;
+                return;
+              }
+            } catch (e) { /* ignore */ }
+            location.hash = '#/board';
+          }, 400);
       }
     } catch (err) {
       console.error('Login request failed:', err);
