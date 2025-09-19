@@ -1,8 +1,7 @@
-
-<div class="login-page">
+<div id="registerPage" class="login-page">
   <header class="login-header">
-      <img src="/src/assets/img/logo.png" alt="Tasklistapp Logo" class="logo" />
-    </header>
+    <img src="/src/assets/img/logo.png" alt="Tasklistapp Logo" class="logo" />
+  </header>
   <div class="login-card">
     <!-- Barra superior con botón para volver al inicio -->
     
@@ -12,69 +11,50 @@
     <!-- Formulario de registro -->
     <!-- Se usa novalidate para manejar validaciones con JS en lugar del navegador -->
     <form id="registerForm" class="form" autocomplete="off" novalidate>
-      
-      <!-- Campo: Nombres -->
-      <div class="row center-row">
-        <label for="firstName" class="label-login"></label>
+      <!-- Nombres y apellidos en fila compacta -->
+      <div class="row row-inline">
         <div class="input-wrap">
           <input id="firstName" name="firstName" type="text" placeholder="Nombre" required minlength="2" />
+          <small class="error-msg" id="firstNameError"></small>
         </div>
-        <!-- Mensaje de error si el nombre no cumple -->
-        <small class="error-msg" id="firstNameError"></small>
-      </div>
-
-      <!-- Campo: Apellidos -->
-      <div class="row center-row">
-        <label for="lastName" class="label-login"></label>
         <div class="input-wrap">
           <input id="lastName" name="lastName" type="text" placeholder="Apellido" required minlength="2" />
+          <small class="error-msg" id="lastNameError"></small>
         </div>
-        <!-- Mensaje de error si el apellido no cumple -->
-        <small class="error-msg" id="lastNameError"></small>
       </div>
 
-      <!-- Campo: Edad -->
-      <div class="row center-row">
-        <label for="age"></label>
+      <!-- Edad -->
+      <div class="row">
         <div class="input-wrap">
           <input id="age" name="age" type="number" placeholder="Edad" required min="13" />
+          <small class="error-msg" id="ageError"></small>
         </div>
-        <!-- Mensaje de error si la edad es menor a 13 o inválida -->
-        <small class="error-msg" id="ageError"></small>
       </div>
 
-      <!-- Campo: Correo electrónico -->
-      <div class="row center-row">
-        <label for="email" class="label-login"></label>
+      <!-- Correo -->
+      <div class="row">
         <div class="input-wrap">
           <input id="email" name="email" type="email" placeholder="Correo electrónico" required />
+          <small class="error-msg" id="emailError"></small>
         </div>
-        <!-- Mensaje de error si el correo no es válido -->
-        <small class="error-msg" id="emailError"></small>
       </div>
 
-      <!-- Campo: Contraseña -->
-      <div class="row center-row">
-        <label for="password" class="label-login"></label>
+      <!-- Contraseña -->
+      <div class="row">
         <div class="input-wrap">
           <input id="password" name="password" type="password" placeholder="Contraseña" required minlength="8" />
-          <!-- Botón para mostrar/ocultar contraseña -->
-          <button id="togglePasswordReg" type="button" class="toggle-pass" aria-pressed="false" aria-label="Mostrar contraseña">Mostrar</button>
+          <button id="togglePasswordReg" type="button" class="toggle-pass">Mostrar</button>
+          <small class="error-msg" id="passwordError"></small>
         </div>
-        <!-- Mensaje de error si la contraseña no cumple -->
-        <small class="error-msg" id="passwordError"></small>
       </div>
 
-      <!-- Campo: Confirmar contraseña -->
-      <div class="row center-row">
-        <label for="confirmPassword"></label>
+      <!-- Confirmar contraseña -->
+      <div class="row">
         <div class="input-wrap">
           <input id="confirmPassword" name="confirmPassword" type="password" placeholder="Confirmar contraseña" required minlength="8" />
-          <!-- Botón para mostrar/ocultar confirmación -->
-          <button id="toggleConfirmReg" type="button" class="toggle-pass" aria-pressed="false" aria-label="Mostrar contraseña">Mostrar</button>
+          <button id="toggleConfirmReg" type="button" class="toggle-pass">Mostrar</button>
+          <small class="error-msg" id="confirmPasswordError"></small>
         </div>
-        <!-- Mensaje de error si las contraseñas no coinciden -->
-        <small class="error-msg" id="confirmPasswordError"></small>
       </div>
 
       <!-- Botón de registro -->
