@@ -117,7 +117,7 @@ async function loadView(name) {
   if (backBtn) {
     backBtn.addEventListener('click', (e) => {
       e.preventDefault();
-      location.hash = '#/aboutUs';
+      location.hash = '#/board';
     });
   }
 }
