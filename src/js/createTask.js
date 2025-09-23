@@ -6,6 +6,7 @@ export function initCreateTask() {
   const description = document.getElementById("description");
   const status = document.getElementById("status");
   const userInput = document.getElementById('user');
+  const expectedDate = document.getElementById('expectedDate');
 
 
   const btn = document.getElementById("createTaskBtn");
@@ -25,6 +26,8 @@ export function initCreateTask() {
     titleError: document.getElementById("titleError"),
     descriptionError: document.getElementById("descriptionError"),
     statusError: document.getElementById("statusError"),
+    expectedDateError: document.getElementById("expectedDateError")
+
   };
 
   function validate() {
@@ -40,12 +43,16 @@ export function initCreateTask() {
     if (!status.value) {
       errors.statusError.textContent = "Selecciona un estado";
       valid = false;
-    } else errors.statusError.textContent = "";
+    } else errors.statusError.textContent = '';
+    if (!expectedDate.value) {
+      errors.expectedDateError.textContent = "Selecciona una fecha";
+      valid = false;
+    } else errors.expectedDateError.textContent = "";
     btn.disabled = !valid;
     return valid;
   }
 
-  [title, description, status].forEach(input =>
+  [title, description, status, expectedDate].forEach(input =>
     input.addEventListener("input", validate)
   );
 
@@ -61,7 +68,9 @@ export function initCreateTask() {
       title: title.value.trim(),
       description: description.value.trim(),
       status: status.value,
+      expectedDate: expectedDate.value,
       user: userId || '',
+
     };
     try {
       const base = import.meta.env.VITE_API_URL || 'http://localhost:3000';

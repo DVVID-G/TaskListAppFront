@@ -6,6 +6,7 @@ export function initEditTask() {
   const description = document.getElementById('description');
   const status = document.getElementById('status');
   const userInput = document.getElementById('user');
+  const expectedDate = document.getElementById('expectedDate');
 
   const btn = document.getElementById('editTaskBtn');
   const btnText = document.getElementById('btnTextEdit');
@@ -23,7 +24,8 @@ export function initEditTask() {
   const errors = {
     titleError: document.getElementById('titleError'),
     descriptionError: document.getElementById('descriptionError'),
-    statusError: document.getElementById('statusError')
+    statusError: document.getElementById('statusError'),
+    expectedDateError: document.getElementById('expectedDateError')
   };
 
   /**
@@ -70,11 +72,15 @@ export function initEditTask() {
       errors.statusError.textContent = 'Selecciona un estado';
       valid = false;
     } else errors.statusError.textContent = '';
+    if (!expectedDate.value) {
+      errors.expectedDateError.textContent = 'Selecciona una fecha';
+      valid = false;
+    } else errors.expectedDateError.textContent = '';
     btn.disabled = !valid;
     return valid;
   }
 
-  [title, description, status].forEach(i => i.addEventListener('input', validate));
+  [title, description, status, expectedDate].forEach(i => i.addEventListener('input', validate));
 
   // populate user hidden field if available
   const storedUserId = localStorage.getItem('userId');
@@ -106,6 +112,8 @@ export function initEditTask() {
       }
       title.value = data.title || data.task?.title || '';
       description.value = data.description || data.task?.description || '';
+      expectedDate.value = (data.expectedDate || data.task?.expectedDate || '').split('T')[0] || '';
+      // Try to map backend status to UI label
       const backendStatus = data.status || data.task?.status || '';
       const uiMap = { 'Por hacer':'Por hacer','Haciendo':'En progreso','Hecho':'Completada' };
       if (uiMap[backendStatus]) status.value = uiMap[backendStatus];
@@ -132,6 +140,7 @@ export function initEditTask() {
       title: title.value.trim(),
       description: description.value.trim(),
       status: mapStatusForBackend(status.value),
+      expectedDate: expectedDate.value,
       user: localStorage.getItem('userId') || ''
     };
     // Debug: show payload that will be sent
@@ -156,14 +165,18 @@ export function initEditTask() {
         if (putRes.ok) {
           msg.textContent = '✅ Tarea actualizada';
           msg.className = 'success-msg';
-          setTimeout(() => { location.hash = '#/board'; }, 600);
+          // Dispatch event so the board can refresh if it's currently open
+          try { window.dispatchEvent(new CustomEvent('task:updated', { detail: { id: editingId } })); } catch (e) {}
+          // Navigate to board with cache-buster to force fresh fetch
+          setTimeout(() => { location.hash = '#/board?_=' + Date.now(); }, 600);
         } else {
           msg.textContent = putData.message || putData.error || `Error ${putRes.status}`;
         }
       } else if (res.ok) {
         msg.textContent = '✅ Tarea actualizada';
         msg.className = 'success-msg';
-        setTimeout(() => { location.hash = '#/board'; }, 600);
+        try { window.dispatchEvent(new CustomEvent('task:updated', { detail: { id: editingId } })); } catch (e) {}
+        setTimeout(() => { location.hash = '#/board?_=' + Date.now(); }, 600);
       } else {
         msg.textContent = data.message || data.error || `Error ${res.status}`;
       }
