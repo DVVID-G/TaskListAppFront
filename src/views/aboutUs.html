@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiénes Somos - TasklistApp</title>
+    <link rel="stylesheet" href="../styles/base.css"> 
+    <style>
+        /* Texto general y encabezados */
+        body {
+            color: #fff; /* Letras blancas */
+            background-color: #242424; /* Fondo oscuro */
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            color: #fff; /* Encabezados blancos */
+        }
+
+        /* Contenedores y tarjetas */
+        .card {
+            background-color: #333; /* Fondo de la tarjeta más oscuro */
+            padding: 1.5rem;
+            border-radius: 10px;
+            max-width: 800px;
+            margin: 2rem auto;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+
+        /* Párrafos y listas */
+        p, li {
+            color: #ddd; /* Texto de párrafos y listas en gris claro */
+        }
+
+        /* Links */
+        a.link {
+            color: #10b981; /* Verde brillante */
+            text-decoration: none;
+        }
+
+        a.link:hover {
+            text-decoration: underline;
+        }
+
+        /* Header logo centrado */
+        .login-header {
+            display: flex;
+            justify-content: center;
+            margin-top: 1rem;
+        }
+
+        .logo {
+            max-width: 150px;
+        }
+
+        /* Botón de volver al tablero */
+        .back-to-login {
+            margin-top: 1.5rem;
+            text-align: center;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            margin-top: 2rem;
+            color: #ccc;
+            font-size: 0.85rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header con logo centrado -->
+    <header class="login-header">
+        <img src="/logo.png" alt="TasklistApp Logo" class="logo">
+    </header>
+
+    <!-- Contenedor principal -->
+    <div class="card quienes-container">
+        <h1>Quiénes Somos</h1>
+        <p>
+            Bienvenido a <strong>TasklistApp</strong>, la aplicación web full-stack diseñada para gestionar tus tareas personales de manera sencilla, segura y accesible desde cualquier dispositivo.
+        </p>
+
+        <h2>Nuestro propósito</h2>
+        <ul>
+            <li>✅ Permitir que cualquier usuario se registre y autentique de forma segura.</li>
+            <li>✅ Gestionar tareas: crear, editar y eliminar con facilidad.</li>
+            <li>✅ Acceso desde cualquier dispositivo: desktop, tablet o móvil.</li>
+            <li>✅ Interfaz moderna, intuitiva y atractiva.</li>
+        </ul>
+
+        <h2>¿Qué puedes hacer con TasklistApp?</h2>
+        <ul>
+            <li>Organizar tu día a día con listas de tareas.</li>
+            <li>Visualizar tareas pendientes, en progreso o completadas en nuestro tablero estilo Kanban.</li>
+            <li>Disfrutar de un diseño limpio y responsive, optimizado para todo tipo de pantallas.</li>
+        </ul>
+
+        <!-- BOTÓN: Volver al tablero -->
+        <div class="back-to-login">
+            <a href="board.html" class="link">← Volver al tablero</a>
+        </div>
+    </div>
+
+    <!-- Opcional footer simple -->
+    <footer>
+        &copy; 2025 TasklistApp. Todos los derechos reservados.
+    </footer>
+</body>
+</html>

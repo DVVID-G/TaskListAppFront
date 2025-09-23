@@ -91,6 +91,7 @@ async function loadView(name) {
   if (name === 'home') initHome();
   if (name === 'board') initBoard();
   if (name === 'signup') initSignup();
+  if (name === 'aboutUs') initaboutUs();
   if (name === 'profile') {
     // Lazy-load the profile module and initialize it when the view is shown
     import('../js/profile.js').then(module => {
@@ -110,6 +111,17 @@ async function loadView(name) {
       try { module.initEditTask && module.initEditTask(); } catch (e) { console.error('initEditTask error', e); }
     }).catch(err => console.error('Could not load editTask module', err));
   }
+  function initaboutUs() {
+  // Si quieres que el botón "Volver al tablero" funcione
+  const backBtn = document.querySelector('.back-to-login a');
+  if (backBtn) {
+    backBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      location.hash = '#/aboutUs';
+    });
+  }
+}
+
 }
 
 /**
@@ -130,7 +142,7 @@ function handleRoute() {
   // Example: '#/reset-password?token=...' -> 'reset-password'
   const raw = location.hash.startsWith('#/') ? location.hash.slice(2) : '';
   const path = raw ? raw.split('?')[0] : 'home';
-  const known = ['home', 'board', 'signup', 'createTask', 'editTask', 'reset-password', 'profile'];
+  const known = ['home', 'board', 'signup', 'createTask', 'editTask', 'reset-password', 'profile', 'aboutUs'];
   const route = known.includes(path) ? path : 'home';
 
   loadView(route).catch(err => {
