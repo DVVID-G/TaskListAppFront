@@ -1216,6 +1216,19 @@ footer.site-footer {
 }
 .footer-brand-desc { margin: 0; color: #cbd5e1; }
 
+/* Footer brand centering */
+.footer-brand {
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* center logo and text horizontally */
+    justify-content: center;
+}
+
+/* On desktop keep the brand aligned to start (left) if layout requires left alignment, but center visually by default */
+@media (min-width: 768px) {
+    .site-footer .footer-grid > div:first-child { justify-self: center; }
+}
+
 /* Social section */
 .social-section { display:flex; flex-direction:column; align-items:center; gap:0.5rem; }
 .social-title { margin:0; font-size:1rem; font-weight:700; color:#e6eefc; }
