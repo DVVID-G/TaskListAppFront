@@ -1,6 +1,9 @@
 // profile.js
 // Fetches current user info and populates the profile view.
 
+import '../styles/base.css';
+import '../styles/profile.css';
+
 const API = (import.meta.env.VITE_API_URL || 'http://localhost:3000').replace(/\/$/, '');
 
 // Debug panel helper (module scope) - hidden by default, toggle with the gear button

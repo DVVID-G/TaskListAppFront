@@ -40,3 +40,4 @@ initRouter();
 // --- Render the global footer and keep it fresh on navigation ---
 renderFooter();
 window.addEventListener('hashchange', renderFooter);
+

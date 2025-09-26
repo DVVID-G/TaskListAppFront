@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiénes Somos - TasklistApp</title>
+    <link rel="stylesheet" href="../styles/base.css"> 
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <style>
+        body {
+            background-color: #121212; /* Fondo oscuro */
+            font-family: Arial, Helvetica, sans-serif;
+            color: #fff; /* Letras blancas */
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        .glass-card {
+            background-color: rgba(33, 33, 33, 0.7); /* Fondo semi-transparente */
+            backdrop-filter: blur(10px); /* Efecto blur */
+            border-radius: 1rem;
+            padding: 2rem;
+            max-width: 900px;
+            margin: 2rem auto;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+        }
+
+        h1, h2, h3 {
+            color: #fff;
+        }
+
+        p, li {
+            color: #ddd;
+        }
+
+        a.link {
+            color: #3B82F6; /* Azul agradable */
+            text-decoration: none;
+        }
+
+        a.link:hover {
+            text-decoration: underline;
+        }
+
+        .login-header {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 2rem;
+        }
+
+        .logo {
+            max-width: 150px;
+        }
+
+        .back-to-login {
+            text-align: left;
+            margin-top: 1.5rem;
+        }
+
+        .back-btn {
+            background-color: rgba(59, 130, 246, 0.2);
+            color: #fff;
+            padding: 0.25rem 0.75rem;
+            border-radius: 0.5rem;
+            font-size: 0.85rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            transition: all 0.3s;
+        }
+
+        .back-btn:hover {
+            background-color: rgba(59, 130, 246, 0.4);
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 2rem;
+            color: #ccc;
+            font-size: 0.85rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header con logo centrado -->
+    <header class="login-header">
+        <img src="/logo.png" alt="TasklistApp Logo" class="logo">
+    </header>
+
+    <!-- Contenedor principal con efecto glass -->
+    <div class="glass-card quienes-container">
+        <h1 class="text-2xl font-bold mb-4">Quiénes Somos</h1>
+        <p class="mb-4">
+            Bienvenido a <strong>TasklistApp</strong>, la aplicación web full-stack diseñada para gestionar tus tareas personales de manera sencilla, segura y accesible desde cualquier dispositivo.
+        </p>
+
+        <h2 class="text-xl font-semibold mb-2">Nuestro propósito</h2>
+        <ul class="list-disc list-inside mb-4">
+            <li>✅ Permitir que cualquier usuario se registre y autentique de forma segura.</li>
+            <li>✅ Gestionar tareas: crear, editar y eliminar con facilidad.</li>
+            <li>✅ Acceso desde cualquier dispositivo: desktop, tablet o móvil.</li>
+            <li>✅ Interfaz moderna, intuitiva y atractiva.</li>
+        </ul>
+
+        <h2 class="text-xl font-semibold mb-2">¿Qué puedes hacer con TasklistApp?</h2>
+        <ul class="list-disc list-inside mb-4">
+            <li>Organizar tu día a día con listas de tareas.</li>
+            <li>Visualizar tareas pendientes, en progreso o completadas en nuestro tablero estilo Kanban.</li>
+            <li>Disfrutar de un diseño limpio y responsive, optimizado para todo tipo de pantallas.</li>
+        </ul>
+
+        <!-- BOTÓN: Volver al tablero -->
+        <div class="back-to-login">
+            <a href="board.html" class="back-btn">
+                <i data-lucide="arrow-left" class="h-4 w-4"></i>
+                Volver al tablero
+            </a>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        &copy; 2025 TasklistApp. Todos los derechos reservados.
+    </footer>
+
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+</html>
