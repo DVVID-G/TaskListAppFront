@@ -1,4 +1,4 @@
-<div class="login-page">
+<div class="login-page" style="flex: 1 1 auto; min-height: 0;">
   <header class="login-header header-logo-wrapper">
     <img src="/logo.png" alt="Tasklistapp Logo" class="app-logo" />
   </header>
@@ -104,3 +104,12 @@
     </div>
   </div>
 </div>
+
+  <script type="module">
+    import { renderFooter } from '/src/components/footer.js';
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', () => renderFooter());
+    } else {
+      renderFooter();
+    }
+  </script>

@@ -1,4 +1,5 @@
 import { loginUser } from '../services/userService.js';
+import { showMessage } from './message.js';
 
 export function initResetPassword() {
   const form = document.getElementById('resetForm');
@@ -16,15 +17,16 @@ export function initResetPassword() {
   const msg = document.getElementById('resetMsg');
 
   function showResetMessage(text, type = 'info') {
-    try {
-      if (msg) {
-        msg.textContent = text;
-        msg.style.display = 'block';
-        msg.style.color = type === 'error' ? 'var(--error-color)' : (type === 'success' ? 'var(--success-color)' : 'inherit');
-        return;
-      }
-      console[type === 'error' ? 'error' : 'log'](text);
-    } catch (e) { console.error(e); }
+    // prefer the local #resetMsg element when present so layout doesn't shift
+    if (msg) {
+      msg.textContent = text;
+      msg.style.display = 'block';
+      msg.classList.remove('app-message', 'app-message--success', 'app-message--error', 'app-message--info');
+      msg.classList.add('app-message', `app-message--${type}`);
+      msg.setAttribute('role', type === 'error' ? 'alert' : 'status');
+      return msg;
+    }
+    return showMessage(text, type);
   }
 
   function validate() {
