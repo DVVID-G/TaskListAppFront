@@ -8,38 +8,42 @@ function footerTemplate() {
     <footer class="site-footer">
       <div class="footer-grid">
         
-        <!-- Branding / Description -->
-        <div>
-          <div class="text-xl font-semibold">Tasklistapp</div>
-          <p class="text-sm mt-2">
+        <!-- Branding / Description (logo + short description) -->
+        <div class="footer-brand">
+          <img src="/logo.png" alt="Tasklistapp" class="footer-logo" />
+          <p class="text-sm mt-2 footer-brand-desc">
             Administra tus tareas con tableros Kanban y perfiles de usuario.
           </p>
         </div>
 
         <!-- Social Media Links -->
-        <div class="social-icons flex justify-center md:justify-center">
-          <a href="https://twitter.com" target="_blank" aria-label="Twitter">
-            <i class="fab fa-twitter"></i>
-          </a>
-          <a href="https://linkedin.com" target="_blank" aria-label="LinkedIn">
-            <i class="fab fa-linkedin"></i>
-          </a>
-          <a href="https://instagram.com" target="_blank" aria-label="Instagram">
-            <i class="fab fa-instagram"></i>
-          </a>
-          <a href="https://facebook.com" target="_blank" aria-label="Facebook">
-            <i class="fab fa-facebook"></i>
-          </a>
-          <a href="https://youtube.com" target="_blank" aria-label="YouTube">
-            <i class="fab fa-youtube"></i>
-          </a>
+        <div class="social-section">
+          <h4 class="social-title">Redes sociales</h4>
+          <div class="social-icons">
+            <a href="https://twitter.com" target="_blank" aria-label="Twitter">
+              <i class="fab fa-twitter"></i>
+            </a>
+            <a href="https://linkedin.com" target="_blank" aria-label="LinkedIn">
+              <i class="fab fa-linkedin"></i>
+            </a>
+            <a href="https://instagram.com" target="_blank" aria-label="Instagram">
+              <i class="fab fa-instagram"></i>
+            </a>
+            <a href="https://facebook.com" target="_blank" aria-label="Facebook">
+              <i class="fab fa-facebook"></i>
+            </a>
+            <a href="https://youtube.com" target="_blank" aria-label="YouTube">
+              <i class="fab fa-youtube"></i>
+            </a>
+          </div>
         </div>
 
-        <!-- About Us -->
-        <div>
-          <a href="/#/about" class="hover:text-blue-400 text-sm">
-            Sobre nosotros
-          </a>
+        <!-- About Us (summarized paragraph) -->
+        <div class="about-summary-block">
+          <h3 class="footer-about-title">Sobre nosotros</h3>
+          <p class="about-text">
+            TasklistApp es una aplicación web full‑stack para gestionar tus tareas de forma sencilla y segura. Permite registrarse y autenticarse, crear, editar y eliminar tareas, y visualizar el flujo de trabajo en un tablero Kanban responsivo, accesible desde desktop, tablet y móvil.
+          </p>
         </div>
       </div>
 

@@ -20,11 +20,24 @@ body {
     margin: 0;
     padding: 0;
     min-height: 100vh;
+    display: flex; /* make page a column so footer can stick */
+    flex-direction: column;
 
 }
 html{
   height: 100%;
   margin: 0;
+}
+/* App root should grow to push footer to the bottom */
+#app {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto; /* grow to fill available space */
+}
+
+/* Main content area: if your app uses a main element or .kanban-container as the page body, ensure it can grow */
+.kanban-container, .kanban-main, main {
+    flex: 1 1 auto;
 }
 .container {
     width: 100%;
@@ -1138,7 +1151,8 @@ h1 {
 footer.site-footer {
   background: #0f172a; /* slate-900 */
   color: #e2e8f0; /* slate-200 */
-  margin-top: 2.5rem; /* mt-10 */
+    margin-top: 2.5rem; /* mt-10 */
+    flex-shrink: 0; /* avoid footer shrinking when space is tight */
 }
 
 /* Grid container */
@@ -1153,15 +1167,67 @@ footer.site-footer {
   text-align: center; /* center text by default (mobile) */
 }
 
+/* About details block styling */
+.about-summary-block { margin-top: 0.25rem; }
+.footer-about-title {
+    font-size: 1.05rem;
+    margin: 0 0 0.45rem 0;
+    color: #e6eefc; /* slightly brighter than body text */
+    font-weight: 700;
+}
+.about-text {
+    color: #cbd5e1; /* lighter slate */
+    font-size: 0.95rem;
+    margin: 0;
+    text-align: justify; /* justified as requested */
+    line-height: 1.45;
+}
+
+/* On small screens keep center alignment but allow justified on larger widths */
+@media (max-width: 767px) {
+    .site-footer .footer-grid { text-align: center; }
+    .about-text { text-align: left; /* left-align on very small screens to improve flow */ }
+}
+
+@media (min-width: 768px) {
+    .site-footer .footer-grid { text-align: left; }
+    .about-text { text-align: justify; }
+}
+
 /* Tablet / Desktop layout */
 @media (min-width: 768px) {
   .site-footer .footer-grid {
-    grid-template-columns: 1fr 1fr 1fr; /* 3 columns */
-    text-align: left; /* reset for bigger screens */
+        grid-template-columns: 1fr 1fr 1fr; /* 3 columns */
+        text-align: left; /* reset for bigger screens */
   }
-  .site-footer .footer-grid > div:last-child {
-    text-align: right; /* align "Sobre nosotros" */
-  }
+    /* center the right-most (about) column on desktop */
+    .site-footer .footer-grid > div:last-child {
+        text-align: center; /* center "Sobre nosotros" */
+        justify-self: center;
+    }
+}
+
+/* Logo styles */
+.footer-logo {
+    max-width: 120px;
+    height: auto;
+    display: block;
+    margin-bottom: 0.5rem;
+}
+.footer-brand-desc { margin: 0; color: #cbd5e1; }
+
+/* Social section */
+.social-section { display:flex; flex-direction:column; align-items:center; gap:0.5rem; }
+.social-title { margin:0; font-size:1rem; font-weight:700; color:#e6eefc; }
+.social-icons { display:flex; gap:0.6rem; align-items:center; justify-content:center; }
+.social-icons a { display:inline-flex; align-items:center; justify-content:center; width:36px; height:36px; border-radius:8px; background: rgba(255,255,255,0.03); color:#6fb0ff; text-decoration:none; transition: transform 120ms ease, background 120ms ease; }
+.social-icons a:hover { background: rgba(255,255,255,0.06); transform: translateY(-2px); }
+.social-icons i { font-size:16px; }
+
+/* Right-justify the About title on larger screens */
+@media (min-width: 768px) {
+    .site-footer .footer-grid > div:last-child { text-align: center; justify-self: center; }
+    .site-footer .footer-grid > div:last-child .footer-about-title { text-align: center; }
 }
 
 /* Social icons */
