@@ -1,6 +1,8 @@
 // Compatibility stub: some build systems or older imports may reference 'Login.js' (capital L).
 // Re-export from the canonical lowercase module so both import paths resolve to the same implementation.
 export * from './login.js';
+import { showMessage } from './message.js';
+
 export function initLogin() {
   console.log('[initLogin] initializing login form');
   const form = document.getElementById('loginForm');
@@ -33,30 +35,7 @@ export function initLogin() {
     passwordError: document.getElementById('passwordError'),
   };
 
-  // Non-modal message helper (replaces alert())
-  function showMessage(text, type = 'info') {
-    try {
-      const info = document.getElementById('infoMsg') || document.getElementById('loginMsg');
-      if (info) {
-        info.textContent = text;
-        info.style.display = 'block';
-        info.style.color = type === 'error' ? 'var(--error-color)' : (type === 'success' ? 'var(--success-color)' : 'inherit');
-        return;
-      }
-      const container = document.createElement('div');
-      container.id = 'loginMsg';
-      container.textContent = text;
-      container.style.margin = '0.5rem 0';
-      container.style.padding = '0.5rem 0.75rem';
-      container.style.borderRadius = '4px';
-      container.style.background = type === 'error' ? '#fff3f3' : 'transparent';
-      container.style.color = type === 'error' ? 'var(--error-color)' : (type === 'success' ? 'var(--success-color)' : '#fff');
-      const ref = form || document.getElementById('app') || document.body;
-      ref.parentElement ? ref.parentElement.insertBefore(container, ref) : document.body.appendChild(container);
-    } catch (e) {
-      console[type === 'error' ? 'error' : 'log'](text);
-    }
-  }
+  // Using shared showMessage helper imported from ./message.js
 
   /**
    * 🔑 Nueva función de validación

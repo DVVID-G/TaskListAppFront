@@ -7,6 +7,7 @@
 
 import './styles/base.css';
 import { initLogin } from './js/login.js';
+import { renderFooter } from './components/footer.js';// Global footer renderer
 // If the app was opened with a plain path like /reset-password?token=...,
 // rewrite it to the SPA hash route so the router and reset page can read the token.
 try {
@@ -35,3 +36,8 @@ import { initRouter } from './routes/route.js';
  * This sets up listeners and renders the correct view on app start.
  */
 initRouter();
+
+// --- Render the global footer and keep it fresh on navigation ---
+renderFooter();
+window.addEventListener('hashchange', renderFooter);
+

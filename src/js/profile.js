@@ -1,9 +1,9 @@
-// profile.js
-// Fetches current user info and populates the profile view.
+// src/js/profile.js
+import '../styles/base.css';
 
 const API = (import.meta.env.VITE_API_URL || 'http://localhost:3000').replace(/\/$/, '');
 
-// Debug panel helper (module scope) - hidden by default, toggle with the gear button
+// Debug panel helper (module scope)
 function dbg(msg, obj) {
   try {
     let panel = document.getElementById('profileDebugPanel');
@@ -26,11 +26,11 @@ function dbg(msg, obj) {
       panel.style.display = 'none'; // hidden by default
       document.body.appendChild(panel);
 
-      // create toggle button
+      // toggle button
       toggle = document.createElement('button');
       toggle.id = 'profileDebugToggle';
       toggle.title = 'Mostrar/Ocultar debug';
-      toggle.textContent = '\u2699'; // gear
+      toggle.textContent = '\u2699';
       toggle.style.position = 'fixed';
       toggle.style.right = '12px';
       toggle.style.bottom = '12px';
@@ -54,41 +54,42 @@ function dbg(msg, obj) {
       });
       document.body.appendChild(toggle);
     }
-    const line = `${new Date().toISOString()} - ${msg}` + (obj ? '\n' + (typeof obj === 'string' ? obj : JSON.stringify(obj, null, 2)) : '') + '\n---\n';
+    const line =
+      `${new Date().toISOString()} - ${msg}` +
+      (obj ? '\n' + (typeof obj === 'string' ? obj : JSON.stringify(obj, null, 2)) : '') +
+      '\n---\n';
     panel.textContent = line + panel.textContent;
-  } catch (e) { console.log('[profile dbg]', msg, obj); }
+  } catch (e) {
+    console.log('[profile dbg]', msg, obj);
+  }
 }
 
 async function loadProfile() {
   const token = localStorage.getItem('token');
   if (!token) {
-    // No token — save intended route and redirect to login so user returns after login
     console.warn('No auth token found, saving postLoginRedirect and redirecting to login');
-    try { localStorage.setItem('postLoginRedirect', '#/profile'); } catch (e) { /* ignore */ }
+    try { localStorage.setItem('postLoginRedirect', '#/profile'); } catch (e) {}
     window.location.hash = '#/';
     return;
   }
 
   try {
-    // Try several strategies to obtain the authenticated user. Backends differ.
-    // Prefer the id encoded in the JWT (if token is a JWT), otherwise use stored localStorage.userId
+    // userId from storage or JWT
     const storedUserId = localStorage.getItem('userId');
     let userId = storedUserId;
     try {
-      // naive JWT parse: header.payload.signature
       const parts = token.split('.');
       if (parts.length === 3) {
         const payload = JSON.parse(atob(parts[1].replace(/-/g,'+').replace(/_/g,'/')));
         if (payload && (payload.sub || payload.userId || payload.id || payload._id)) {
           userId = String(payload.sub || payload.userId || payload.id || payload._id);
           if (userId !== storedUserId) {
-            try { localStorage.setItem('userId', userId); dbg('Synced localStorage.userId from token', { userId }); } catch (e) { /* ignore */ }
+            try { localStorage.setItem('userId', userId); dbg('Synced localStorage.userId from token', { userId }); } catch (e) {}
           }
         }
       }
-    } catch (e) {
-      // not a JWT or parse failed; fall back to stored id
-    }
+    } catch (e) {}
+
     async function tryFetchUser() {
       const headers = { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` };
 
@@ -104,7 +105,7 @@ async function loadProfile() {
         } catch (e) { console.warn('[loadProfile] error fetching by id', e); }
       }
 
-      // 2) GET /api/v1/users?id=:id (some APIs expect query param)
+      // 2) GET /api/v1/users?id=:id
       if (userId) {
         try {
           const url2 = `${API}/api/v1/users?id=${encodeURIComponent(userId)}`;
@@ -128,17 +129,15 @@ async function loadProfile() {
         } catch (e) { console.warn('[loadProfile] error fetching ?userId', e); }
       }
 
-      // 4) GET /api/v1/users (list) and filter by id or email
+      // 4) GET list
       try {
         const url4 = `${API}/api/v1/users`;
         console.log('[loadProfile] trying GET list', url4);
         const r4 = await fetch(url4, { method: 'GET', headers });
         const j4 = await r4.json().catch(() => ({}));
         if (r4.ok && j4) {
-          // j4 could be array or { data: [...] } or { users: [...] }
           let list = Array.isArray(j4) ? j4 : (Array.isArray(j4.data) ? j4.data : (Array.isArray(j4.users) ? j4.users : []));
           if (!list.length && typeof j4 === 'object' && Object.keys(j4).length && !Array.isArray(j4)) {
-            // maybe API returned single object even though ok; return it
             return j4;
           }
           if (list.length) {
@@ -146,24 +145,19 @@ async function loadProfile() {
               const found = list.find(u => String(u._id || u.id) === String(userId));
               if (found) return found;
             }
-            // fallback: try to match by email stored in localStorage.lastResetEmail or token payload if available
             const emailStored = localStorage.getItem('lastResetEmail');
             if (emailStored) {
               const found2 = list.find(u => (u.email || u.correo) === emailStored);
               if (found2) return found2;
             }
-            // return first as last resort
             return list[0];
           }
         }
         console.warn('[loadProfile] GET list failed or empty', r4.status, j4);
       } catch (e) { console.warn('[loadProfile] error fetching list', e); }
 
-      // nothing found
       return null;
     }
-
-    // Use module-scope dbg() for debug panel (defined at top of file)
 
     const result = await tryFetchUser();
     if (!result) {
@@ -172,65 +166,47 @@ async function loadProfile() {
       return;
     }
     dbg('Found user payload', result);
-    const res = { ok: true };
-    const json = result;
 
-    if (res.status === 401) {
-      // Unauthorized — force login
-      console.warn('Token invalid or expired. Redirecting to login.');
-      localStorage.removeItem('token');
-      localStorage.removeItem('userId');
-      window.location.hash = '#/';
-      return;
-    }
+    // normalize payload
+    let user = result.user || result.data || result;
+    if (Array.isArray(user)) user = user[0] || {};
 
-    // handled above
+    // persist id if present
+    try {
+      if (user && (user._id || user.id) && !localStorage.getItem('userId')) {
+        localStorage.setItem('userId', String(user._id || user.id));
+        dbg('localStorage.userId set from payload', { userId: localStorage.getItem('userId') });
+      }
+    } catch (e) {}
 
-  // Try several common shapes: { user: {...} }, { data: {...} }, {...}
-  let user = json.user || json.data || json;
-  // If endpoint returns an array, pick first
-  if (Array.isArray(user)) user = user[0] || {};
+    // map fields
+    const firstName = user.firstName || user.name || user.firstname || user.nombres || '';
+    const lastName = user.lastName || user.surname || user.lastname || user.apellidos || '';
+    const email = user.email || user.correo || user.emailAddress || '';
+    const age = user.edad || user.age || user.years || null;
+    const createdAt = user.createdAt || user.created_at || user.created || null;
 
-  // Persist the user id locally if backend provided it and localStorage missing it
-  try {
-    if (user && (user._id || user.id) && !localStorage.getItem('userId')) {
-      localStorage.setItem('userId', String(user._id || user.id));
-      dbg('localStorage.userId set from payload', { userId: localStorage.getItem('userId') });
-    }
-  } catch (e) { /* ignore */ }
-
-  // Map possible fields (support English and Spanish keys)
-  const firstName = user.firstName || user.name || user.firstname || user.nombres || '';
-  const lastName = user.lastName || user.surname || user.lastname || user.apellidos || '';
-  const email = user.email || user.correo || user.emailAddress || '';
-  const age = user.edad || user.age || user.years || null;
-  const createdAt = user.createdAt || user.created_at || user.created || null;
-
-    // Populate DOM (guarded)
+    // populate DOM
     const setIf = (id, value) => {
       const el = document.getElementById(id);
       if (!el) return;
       if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') el.value = value || '';
       else el.textContent = value || '';
     };
-
     setIf('firstName', firstName);
     setIf('lastName', lastName);
     setIf('email', email);
     setIf('firstNameDisplay', firstName);
     setIf('lastNameDisplay', lastName);
-  setIf('emailDisplay', email);
-
-  // age mapping (some templates use 'age' or 'edad' ids)
-  setIf('age', age);
-  setIf('edadDisplay', age);
-  // Some templates reference `displayEmail` (profile.html has it) — keep both in sync
-  setIf('displayEmail', email);
+    setIf('emailDisplay', email);
+    setIf('age', age);
+    setIf('edadDisplay', age);
+    setIf('displayEmail', email);
 
     const fullName = [firstName, lastName].filter(Boolean).join(' ').trim();
     setIf('fullName', fullName || '');
 
-    // avatar initials (robust: fall back to email local-part if names missing)
+    // avatar initials
     try {
       const avatar = document.querySelector('.h-24.w-24') || document.querySelector('.avatar-circle');
       if (avatar) {
@@ -243,19 +219,18 @@ async function loadProfile() {
         }
         avatar.textContent = initials || '??';
       }
-    } catch (e) { /* ignore */ }
+    } catch (e) {}
 
-    // Populate member-since date in avatar card (id: createdDate)
+    // member since
     if (createdAt) {
       const d = new Date(createdAt);
       if (!isNaN(d)) setIf('createdDate', d.toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' }));
     }
 
-    // Wire save button to module function (robust binding in case inline onclick not present)
+    // wire save button robustly (si no usas inline onclick)
     try {
       const saveBtn = document.querySelector('#saveSection button');
       if (saveBtn) {
-        // clone and remove inline onclick attribute so it won't call an undefined global
         const clone = saveBtn.cloneNode(true);
         try { clone.removeAttribute('onclick'); } catch (e) {}
         saveBtn.replaceWith(clone);
@@ -267,57 +242,34 @@ async function loadProfile() {
           if (window.saveProfile) window.saveProfile();
         });
       }
-    } catch (e) { /* ignore */ }
-
-    // If .back-btn style didn't apply (some SPA setups may not run inline styles), inject a small fallback
-    try {
-      const back = document.querySelector('.back-btn');
-      if (back) {
-        const cs = window.getComputedStyle(back);
-        // If display isn't inline-flex or color is default, add a high-specificity fallback style
-        if (cs.display !== 'inline-flex' || cs.backgroundColor === 'rgba(0, 0, 0, 0)' || cs.color === 'rgb(0, 0, 0)') {
-          const id = 'profile-backbtn-fallback-style';
-          if (!document.getElementById(id)) {
-            const s = document.createElement('style');
-            s.id = id;
-            s.textContent = `
-              .back-btn{ color: var(--primary, #2563eb) !important; background: rgba(37,99,235,0.06) !important; padding:0.45rem !important; border-radius:0.6rem !important; border:1px solid rgba(37,99,235,0.12) !important; display:inline-flex !important; align-items:center !important; justify-content:center !important; cursor:pointer !important; }
-              .back-btn:hover{ background: rgba(37,99,235,0.10) !important; }
-            `;
-            document.head.appendChild(s);
-          }
-          // Also apply inline styles directly to the element as a hard fallback
-          try {
-            back.style.color = 'var(--primary, #2563eb)';
-            back.style.background = 'rgba(37,99,235,0.06)';
-            back.style.padding = '0.45rem';
-            back.style.borderRadius = '0.6rem';
-            back.style.border = '1px solid rgba(37,99,235,0.12)';
-            back.style.display = 'inline-flex';
-            back.style.alignItems = 'center';
-            back.style.justifyContent = 'center';
-            back.style.cursor = 'pointer';
-          } catch (e) { /* ignore inline style failures */ }
-          // Log computed styles into debug panel for diagnostics
-          try { dbg('back-btn computed styles (after fallback)', { display: cs.display, color: cs.color, backgroundColor: cs.backgroundColor }); } catch (e) { /* ignore */ }
-        }
-      }
-    } catch (e) { /* ignore */ }
+    } catch (e) {}
 
   } catch (err) {
     console.error('Error fetching profile:', err);
   }
 }
 
-// Auto-run when DOM is ready
+// Auto-run
 document.addEventListener('DOMContentLoaded', () => {
-  // Expose for manual calls
   window.loadProfile = loadProfile;
   loadProfile();
+
+  // Enlazar botón eliminar si no hay onclick o quieres redundancia
+  const delBtn = document.querySelector('.btn.btn-danger, #deleteBtn');
+  if (delBtn && !delBtn._deleteBound) {
+    delBtn.addEventListener('click', (e) => {
+      // si ya tienes onclick="handleDeleteAccount()" en HTML, esto es redundante pero inofensivo
+      if (typeof window.deleteAccount === 'function') {
+        e.preventDefault();
+        window.deleteAccount();
+      }
+    });
+    delBtn._deleteBound = true;
+  }
 });
 
 /**
- * Save profile edits to the backend. Sends only changed fields.
+ * Guardar perfil (PUT/PATCH con fallbacks)
  */
 async function saveProfile() {
   const token = localStorage.getItem('token');
@@ -327,7 +279,7 @@ async function saveProfile() {
     return;
   }
 
-  // Determine userId from token or stored
+  // userId
   let userId = localStorage.getItem('userId');
   try {
     const parts = token.split('.');
@@ -337,14 +289,13 @@ async function saveProfile() {
         userId = String(payload.sub || payload.userId || payload.id || payload._id);
       }
     }
-  } catch (e) { /* ignore */ }
+  } catch (e) {}
 
   if (!userId) {
     dbg('Cannot save profile: missing user id');
     return;
   }
 
-  // Read inputs (fall back to display text if inputs not present)
   const getVal = id => {
     const el = document.getElementById(id);
     if (!el) return '';
@@ -363,7 +314,6 @@ async function saveProfile() {
 
   if (!Object.keys(payload).length) {
     dbg('No profile changes to save');
-    // toggle off edit mode if present
     if (window.toggleEdit) window.toggleEdit();
     return;
   }
@@ -374,7 +324,8 @@ async function saveProfile() {
   try {
     const url = `${API}/api/v1/users/${encodeURIComponent(userId)}`;
     dbg('Saving profile to', { url, payload });
-    // Try PUT first (some APIs expect PUT for updates)
+
+    // PUT
     console.log('[saveProfile] Attempting PUT', url);
     const putAttempt = await fetch(url, {
       method: 'PUT',
@@ -390,11 +341,10 @@ async function saveProfile() {
 
     let resultBody = null;
     if (putAttempt.ok) {
-      // treat as success
       dbg('PUT succeeded', putAttemptBody);
       resultBody = putAttemptBody;
     } else {
-      // PUT failed, now try PATCH to same URL
+      // PATCH
       console.log('[saveProfile] PUT failed, trying PATCH', url, 'status', putAttempt.status);
       const res = await fetch(url, {
         method: 'PATCH',
@@ -408,7 +358,6 @@ async function saveProfile() {
       try { patchBody = await res.json(); } catch (e) { patchBody = await res.text().catch(() => ''); }
 
       if (res.status === 401) {
-        // unauthorized
         dbg('Save profile unauthorized', { status: res.status, body: patchBody });
         localStorage.removeItem('token');
         localStorage.removeItem('userId');
@@ -419,7 +368,6 @@ async function saveProfile() {
       if (!res.ok) {
         dbg('Failed to save profile (PATCH) after PUT', { status: res.status, body: patchBody });
         if (res.status === 404) {
-          // Try PATCH to collection endpoint
           const collUrl = `${API}/api/v1/users`;
           const collPayload = Object.assign({ id: userId }, payload);
           console.log('[saveProfile] Trying collection PATCH fallback', collUrl);
@@ -439,41 +387,34 @@ async function saveProfile() {
             alert('No se pudieron guardar los cambios. El servidor devolvió ' + res.status);
             return;
           }
-          // Use collBody to update UI if present
           resultBody = collBody;
         } else {
           alert('No se pudieron guardar los cambios: ' + (patchBody && patchBody.message ? patchBody.message : res.status));
           return;
         }
       } else {
-        // PATCH succeeded
         resultBody = patchBody;
       }
     }
 
-    // Success — update UI
+    // success: update UI
     dbg('Profile saved successfully', resultBody);
-    // Update displays
     const setIf = (id, value) => {
       const el = document.getElementById(id);
       if (!el) return;
       if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') el.value = value || '';
       else el.textContent = value || '';
     };
-    if (payload.nombres) {
-      setIf('firstNameDisplay', payload.nombres);
-      setIf('firstName', payload.nombres);
-    }
-    if (payload.apellidos) {
-      setIf('lastNameDisplay', payload.apellidos);
-      setIf('lastName', payload.apellidos);
-    }
-    if (payload.email) {
-      setIf('emailDisplay', payload.email);
-      setIf('email', payload.email);
-      setIf('displayEmail', payload.email);
-    }
-    // Update full name and avatar initials
+    if (payload.nombres) { setIf('firstNameDisplay', payload.nombres); setIf('firstName', payload.nombres); }
+    if (payload.apellidos) { setIf('lastNameDisplay', payload.apellidos); setIf('lastName', payload.apellidos); }
+    if (payload.email) { setIf('emailDisplay', payload.email); setIf('email', payload.email); setIf('displayEmail', payload.email); }
+
+    const getVal = id => {
+      const el = document.getElementById(id);
+      if (!el) return '';
+      if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') return el.value.trim();
+      return (el.textContent || '').trim();
+    };
     const full = [payload.nombres || getVal('firstNameDisplay'), payload.apellidos || getVal('lastNameDisplay')].filter(Boolean).join(' ');
     setIf('fullName', full);
     try {
@@ -483,20 +424,105 @@ async function saveProfile() {
         const ln = payload.apellidos || getVal('lastNameDisplay') || '';
         avatar.textContent = ((fn[0]||'') + (ln[0]||'')).toUpperCase() || '??';
       }
-    } catch (e) { /* ignore */ }
+    } catch (e) {}
 
-    // Exit edit mode
     if (window.toggleEdit) window.toggleEdit();
 
   } catch (err) {
     dbg('Error saving profile', err.message || err);
     alert('Error al guardar: ' + (err.message || String(err)));
   } finally {
+    const saveBtn = document.querySelector('#saveSection button');
     if (saveBtn) saveBtn.disabled = false;
   }
 }
-
-// expose saveProfile globally
 window.saveProfile = saveProfile;
 
-export { loadProfile, saveProfile };
+/**
+ * ELIMINAR CUENTA
+ * DELETE con body { id: userId } + fallbacks
+ */
+async function deleteAccount() {
+  const token = localStorage.getItem('token');
+
+  // userId desde localStorage o token
+  let userId = localStorage.getItem('userId');
+  try {
+    if (token) {
+      const parts = token.split('.');
+      if (parts.length === 3) {
+        const payload = JSON.parse(atob(parts[1].replace(/-/g,'+').replace(/_/g,'/')));
+        if (payload && (payload.sub || payload.userId || payload.id || payload._id)) {
+          userId = String(payload.sub || payload.userId || payload.id || payload._id);
+        }
+      }
+    }
+  } catch (_) {}
+
+  if (!token || !userId) {
+    alert('No hay sesión activa.');
+    try { localStorage.removeItem('token'); localStorage.removeItem('userId'); } catch (_) {}
+    window.location.hash = '#/';
+    return;
+  }
+
+  const ok = window.confirm('⚠️ Esta acción es permanente. ¿Seguro que quieres eliminar tu cuenta?');
+  if (!ok) return;
+
+  const delBtn = document.querySelector('.btn.btn-danger') || document.getElementById('deleteBtn');
+  if (delBtn) delBtn.disabled = true;
+
+  const headers = { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` };
+  const body = JSON.stringify({ id: userId });
+
+  const attempts = [
+    { method: 'DELETE', url: `${API}/api/v1/users/${encodeURIComponent(userId)}`, body },
+    { method: 'DELETE', url: `${API}/api/v1/users`, body },
+    { method: 'POST',   url: `${API}/api/v1/users/delete`, body },
+    { method: 'DELETE', url: `${API}/api/v1/users/${encodeURIComponent(userId)}?id=${encodeURIComponent(userId)}`, body: undefined },
+    { method: 'DELETE', url: `${API}/api/v1/users?id=${encodeURIComponent(userId)}`, body: undefined },
+  ];
+
+  let lastStatus = 0, lastBody = '';
+  try {
+    for (const a of attempts) {
+      try {
+        console.log('[deleteAccount] trying', a.method, a.url);
+        const res = await fetch(a.url, { method: a.method, headers, ...(a.body ? { body: a.body } : {}) });
+        lastStatus = res.status;
+        let resBody = '';
+        try { resBody = await res.text(); } catch (_) {}
+        lastBody = resBody;
+
+        if (res.ok) {
+          try { localStorage.removeItem('token'); localStorage.removeItem('userId'); } catch (_) {}
+          alert('Tu cuenta ha sido eliminada correctamente.');
+          window.location.hash = '#/';
+          return;
+        }
+
+        if (res.status === 401) {
+          alert('Sesión expirada. Vuelve a iniciar sesión.');
+          try { localStorage.removeItem('token'); localStorage.removeItem('userId'); } catch (_) {}
+          window.location.hash = '#/';
+          return;
+        }
+
+        console.warn('[deleteAccount] failed', a.method, a.url, res.status, resBody);
+      } catch (e) {
+        console.warn('[deleteAccount] network error', a, e);
+      }
+    }
+
+    alert('No se pudo eliminar la cuenta. Código: ' + lastStatus + (lastBody ? `\nRespuesta: ${lastBody}` : ''));
+  } finally {
+    if (delBtn) delBtn.disabled = false;
+  }
+}
+window.deleteAccount = deleteAccount;
+
+// Sobrescribe el handler esperado por el HTML (onclick="handleDeleteAccount()")
+window.handleDeleteAccount = () => window.deleteAccount();
+
+// export para otros módulos si los usas
+export { loadProfile, saveProfile, deleteAccount };

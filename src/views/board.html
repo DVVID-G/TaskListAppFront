@@ -41,22 +41,11 @@
             </a>
           </li>
           <li>
-            <a href="#">
+            <a href="#" id="aboutLink">
               <span class="menu-icon" aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                 <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <rect x="3" y="4" width="18" height="14" rx="2" fill="currentColor" opacity="0.06"/>
                   <path d="M7 8h10M7 12h6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-              </span>
-              <span class="menu-item">Sobre nosotros</span>
-            </a>
-          </li>
-          <li>
-            <a href="#" id="logoutLink">
-              <span class="menu-icon" aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M9 21H6a2 2 0 01-2-2V5a2 2 0 012-2h3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
-                  <path d="M16 17l4-5-4-5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
                   <path d="M21 12H9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
                 </svg>
               </span>
@@ -70,11 +59,10 @@
 </header>
 
   <main class="kanban-main">
-    <div id="kanbanBoard" class="kanban-board">
+  <div id="kanbanBoard" class="kanban-board">
       <div class="kanban-column" data-status="Por hacer">
         <h2 class="kanban-title">Por hacer</h2>
         <ul class="kanban-list" id="todoList-todo"></ul>
-        <a class="btn new-task-btn" href="#/createTask">+</a>
       </div>
 
       <div class="kanban-column" data-status="En progreso">
@@ -87,8 +75,19 @@
         <ul class="kanban-list" id="todoList-done"></ul>
       </div>
     </div>
-
-    
-    </div>
   </main>
+  <!-- CTA row: white area under the board where the create button lives (not floating) -->
+  <div class="board-cta-row">
+    <div class="board-cta">
+      <a href="#/createTask" class="create-task-btn" aria-label="Crear nueva tarea">
+        <span class="btn-icon" aria-hidden="true">
+          <!-- plus icon -->
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </span>
+        <span class="btn-text">Nueva tarea</span>
+      </a>
+    </div>
+  </div>
 </div>

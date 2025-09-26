@@ -1,0 +1,151 @@
+/* profile.css - versión estilo registro/login */
+
+/* Variables de color */
+:root {
+  --primary-color: #3B82F6; /* azul principal */
+  --background-color: #f5f5f5; /* fondo de página */
+  --card-background: #ffffff; /* tarjeta blanca */
+  --text-color: #111111; /* texto principal */
+  --input-border: #d1d5db; /* gris claro para inputs */
+  --input-focus: #3B82F6; /* azul al enfocar */
+}
+
+/* Página principal */
+#profilePage {
+  background: var(--background-color);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100vh;
+  padding: 2rem 1rem;
+  font-family: system-ui, sans-serif;
+  color: var(--text-color);
+}
+
+/* Header con logo */
+.login-header {
+  margin-bottom: 2rem;
+}
+.login-header .app-logo {
+  max-width: 160px;
+  height: auto;
+}
+
+/* Tarjeta del perfil */
+.login-card {
+  background: var(--card-background);
+  color: var(--text-color);
+  padding: 2rem;
+  border-radius: 1rem;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  max-width: 480px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* Títulos dentro de la tarjeta */
+.login-card h2 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  font-size: 1.5rem;
+  text-align: center;
+  color: var(--primary-color);
+}
+
+/* Inputs y filas */
+.row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.row-inline {
+  flex-direction: row;
+  gap: 1rem;
+}
+.input-wrap {
+  display: flex;
+  flex-direction: column;
+}
+.input-wrap input {
+  padding: 0.6rem 0.75rem;
+  border: 1px solid var(--input-border);
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.input-wrap input:focus {
+  border-color: var(--input-focus);
+  box-shadow: 0 0 0 2px rgba(59,130,246,0.2);
+  outline: none;
+}
+
+/* Botones */
+.btn {
+  padding: 0.75rem 1rem;
+  border: none;
+  border-radius: 0.6rem;
+  background: var(--primary-color);
+  color: #fff;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.btn:hover {
+  background: #2563eb;
+}
+
+/* Botones de mostrar contraseña */
+.toggle-pass {
+  margin-top: 0.25rem;
+  align-self: flex-end;
+  background: none;
+  border: none;
+  color: var(--primary-color);
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+
+/* Mensajes de error */
+.error-msg {
+  font-size: 0.75rem;
+  color: #dc2626; /* rojo suave */
+  height: 1rem;
+}
+
+/* Link de volver al login */
+.back-to-login {
+  text-align: center;
+  font-size: 0.9rem;
+}
+.back-to-login a {
+  color: var(--primary-color);
+  text-decoration: none;
+}
+.back-to-login a:hover {
+  text-decoration: underline;
+}
+
+/* Avatar circular */
+.avatar-circle {
+  width: 6rem;
+  height: 6rem;
+  border-radius: 50%;
+  background: var(--primary-color);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin: 0 auto 1rem;
+  user-select: none;
+}
+
+/* Responsive */
+@media (max-width: 500px) {
+  .row-inline {
+    flex-direction: column;
+  }
+}
