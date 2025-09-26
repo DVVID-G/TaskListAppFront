@@ -133,6 +133,19 @@ export function initRouter() {
   handleRoute(); // first render
 }
 
+// Listen for cross-module 'task:updated' events and refresh board when visible
+window.addEventListener('task:updated', (e) => {
+  try {
+    // If we are on the board route, re-run initBoard to fetch fresh data
+    const raw = location.hash.startsWith('#/') ? location.hash.slice(2) : '';
+    const path = raw ? raw.split('?')[0] : 'home';
+    if (path === 'board') {
+      // small timeout to let the server commit before fetching
+      setTimeout(() => { try { initBoard(); } catch (err) { console.debug('initBoard refresh failed', err); } }, 200);
+    }
+  } catch (e) { /* ignore */ }
+});
+
 /**
  * Handle the current route based on the location hash.
  * Fallback to 'home' if the route is unknown.
@@ -228,8 +241,11 @@ async function initBoard() {
   const base = import.meta.env.VITE_API_URL || 'http://localhost:3000';
   const token = localStorage.getItem('token');
   try {
-    const res = await fetch(`${base.replace(/\/$/, '')}/api/v1/tasks`, {
-      headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+    // Add cache-busting and no-store to avoid showing stale responses after an edit
+    const urlTasks = `${base.replace(/\/$/, '')}/api/v1/tasks?_=${Date.now()}`;
+    const res = await fetch(urlTasks, {
+      cache: 'no-store',
+      headers: Object.assign({}, token ? { 'Authorization': `Bearer ${token}` } : {}, { 'Cache-Control': 'no-cache' })
     });
     const data = await res.json();
     console.log('GET /api/v1/tasks payload:', data);
@@ -252,15 +268,21 @@ async function initBoard() {
       realId = realId.replace(/[:\/]/g, '').trim();
 
       li.dataset.id = realId;
+  // Extract possible due/date fields from backend (common names)
+  const dueRaw = task.dueDate || task.due || task.deadline || task.expectedDate || task.due_date || task.expected_at || task.createdAt;
+  // Debug: log the raw date field we received for quicker diagnosis when edits don't appear
+  try { console.debug('[initBoard] task id, dueRaw:', realId, dueRaw); } catch (e) {}
+      const dueLabel = dueRaw ? `Fecha de vencimiento: ${escapeHtml(formatDate(dueRaw))}` : '';
       // Mapear el status backend al texto mostrado en la UI
       const uiStatus = mapStatusForUI(task.status || '');
       li.dataset.status = uiStatus;
       li.innerHTML = `
         <div class="content">
-          <strong>${escapeHtml(task.title || '(sin título)')}</strong>
-          <div>${escapeHtml(task.description || '')}</div>
-        </div>
-        <div class="meta">${escapeHtml(uiStatus || '')}</div>
+          <strong>Titulo: ${escapeHtml(task.title || '(sin título)')}</strong>
+          <div>Descripción: ${escapeHtml(task.description || '')}</div>
+          ${ dueLabel ? `<div class="task-due">${dueLabel}</div>` : '' }
+  </div>
+  <div class="meta">Estado: ${escapeHtml(uiStatus || '')}</div>
         <button class="task-actions-btn" aria-haspopup="true" aria-expanded="false" title="Acciones" draggable="false" tabindex="0">
           <svg draggable="false" width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
             <circle cx="5" cy="12" r="1.8" fill="currentColor" />
@@ -608,6 +630,47 @@ function escapeHtml(str) {
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#039;');
+}
+
+/**
+ * Format an ISO date (or Date) to a short localized string.
+ */
+function formatDate(input) {
+  if (!input) return '';
+  try {
+    let year, month, day;
+    // If it's already a Date, use UTC components
+    if (input instanceof Date) {
+      year = input.getUTCFullYear();
+      month = input.getUTCMonth() + 1;
+      day = input.getUTCDate();
+    } else if (typeof input === 'string') {
+      // date-only like '2025-10-13' -> treat as the exact Y-M-D values
+      const dateOnly = input.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+      if (dateOnly) {
+        year = Number(dateOnly[1]);
+        month = Number(dateOnly[2]);
+        day = Number(dateOnly[3]);
+      } else {
+        // datetime with offset (e.g. '2025-10-13T00:00:00.000+00:00') -> parse and read UTC date parts
+        const dt = new Date(input);
+        if (Number.isNaN(dt.getTime())) return '';
+        year = dt.getUTCFullYear();
+        month = dt.getUTCMonth() + 1;
+        day = dt.getUTCDate();
+      }
+    } else {
+      const dt = new Date(input);
+      if (Number.isNaN(dt.getTime())) return '';
+      year = dt.getUTCFullYear();
+      month = dt.getUTCMonth() + 1;
+      day = dt.getUTCDate();
+    }
+
+    const dd = String(day).padStart(2, '0');
+    const mm = String(month).padStart(2, '0');
+    return `${dd}/${mm}/${year}`;
+  } catch (e) { return ''; }
 }
 
 /**
