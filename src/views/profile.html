@@ -1,161 +1,176 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mi Perfil - Kanbanify</title>
-    <link rel="stylesheet" href="/base.css">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Mi Perfil - Kanbanify</title>
+
+  <!-- Tailwind primero -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Tu CSS unificado -->
+  <link rel="stylesheet" href="/base.css" />
+  <!-- Iconos -->
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 </head>
 <body>
-    <div id="profilePage" class="login-page">
-        <!-- Logo arriba -->
-        <header class="login-header header-logo-wrapper">
-            <img src="/logo.png" alt="Tasklistapp Logo" class="app-logo" />
-        </header>
+  <div id="profilePage" class="login-page" style="flex: 1 1 auto; min-height: 0;">
+    <!-- Logo arriba -->
+    <header class="login-header header-logo-wrapper">
+      <img src="/logo.png" alt="Tasklistapp Logo" class="app-logo" />
+    </header>
 
-        <!-- Tarjeta principal -->
-        <div class="login-card">
-
-            <!-- Botón volver al tablero -->
-             <button onclick="goBack()" 
-                 class="absolute top-4 left-4 flex items-center text-black bg-gray-700/50 hover:bg-gray-700/80 
-                        text-sm px-3 py-1 rounded-lg transition-all duration-300">
-               <i data-lucide="arrow-left" class="mr-1 h-4 w-4"></i>
-               Volver
-             </button>
-                
-             
+    <main class="kanban-main" style="flex: 1 1 auto; width:100%; display:flex; justify-content:center;">
+      <!-- Tarjeta principal -->
+      <div class="login-card">
 
 
-            <!-- Título -->
-            <h2>Mi Perfil</h2>
-            <p class="subtitle">Gestiona tu información personal</p>
+      <!-- Título + meta (centrado) -->
+      <div class="text-center" style="width:100%;">
+        <h2>Mi Perfil</h2>
+        <p class="subtitle">Gestiona tu información personal</p>
 
-            <!-- Avatar -->
-            <div class="avatar-section">
-                <div class="avatar-circle">
-                    <!-- Iniciales o imagen -->
-                </div>
-                <button id="cameraBtn" class="toggle-pass hidden">
-                    <i data-lucide="camera"></i>
-                </button>
-            </div>
-
-            <!-- Nombre y correo -->
-            <h3 id="fullName"></h3>
-            <p id="displayEmail"></p>
-            <div class="text-sm">
-                Miembro desde: <span id="createdDate"></span>
-            </div>
-
-            <!-- Formulario editable -->
-            <form id="profileForm" class="form" autocomplete="off" novalidate>
-                <!-- Nombres -->
-                <div class="row">
-                    <div class="input-wrap">
-                        <input type="text" id="firstName" value="Juan" placeholder="Nombre" class="hidden" />
-                        <p id="firstNameDisplay"></p>
-                    </div>
-                </div>
-
-                <!-- Apellidos -->
-                <div class="row">
-                    <div class="input-wrap">
-                        <input type="text" id="lastName" value="Pérez" placeholder="Apellido" class="hidden" />
-                        <p id="lastNameDisplay"></p>
-                    </div>
-                </div>
-
-                <!-- Email -->
-<div class="row">
-    <div class="input-wrap">
-        <input 
-            type="email" 
-            id="email" 
-            value="juan.perez@email.com" 
-            placeholder="Correo electrónico" 
-            class="hidden"
-        />
-        <p id="emailDisplay" class="bg-gray-700/30 text-white px-3 py-1 rounded-lg text-sm">
-            juan.perez@email.com
-        </p>
-    </div>
-</div>
-
-
-                <!-- Botón guardar -->
-                <div class="row" id="saveSection" style="display: none;">
-                    <button type="button" class="btn" onclick="saveProfile()">
-                        <i data-lucide="save"></i> Guardar cambios
-                    </button>
-                </div>
-            </form>
-
-            <!-- Botón editar -->
-            <div class="row">
-                <button id="editBtn" type="button" class="btn" onclick="toggleEdit()">
-                    <span id="editBtnText">Editar</span>
-                </button>
-            </div>
-
-            <!-- Eliminar cuenta -->
-            <div class="row">
-                <div class="delete-card">
-                    <button class="btn btn-danger" onclick="handleDeleteAccount()">
-                        <i data-lucide="x-circle"></i> Eliminar mi cuenta
-                    </button>
-                </div>
-            </div>
+        <!-- Meta -->
+        <div class="text-sm" style="margin-bottom: 0.5rem;">
+          Miembro desde: <span id="createdDate"></span>
         </div>
-    </div>
+      </div>
 
-    <script>
-        let isEditing = false;
-        lucide.createIcons();
+      <!-- Formulario -->
+      <form id="profileForm" class="form" autocomplete="off" novalidate>
+        <!-- Nombre -->
+        <div class="row center-row">
+          <div class="input-wrap">
+            <label for="firstName">Nombre</label>
+            <input 
+              type="text" 
+              id="firstName" 
+              name="firstName"
+              value="Juan" 
+              placeholder="Tu nombre"
+              autocomplete="given-name"
+              aria-describedby="firstNameHelp"
+              disabled
+            />
+            <small id="firstNameHelp" class="error-msg" style="height:auto;"></small>
+          </div>
+        </div>
 
-        function toggleEdit() {
-            isEditing = !isEditing;
-            const editBtnText = document.getElementById('editBtnText');
-            const saveSection = document.getElementById('saveSection');
-            const cameraBtn = document.getElementById('cameraBtn');
-            const fields = ['firstName', 'lastName', 'email'];
+        <!-- Apellido -->
+        <div class="row center-row">
+          <div class="input-wrap">
+            <label for="lastName">Apellido</label>
+            <input 
+              type="text" 
+              id="lastName" 
+              name="lastName"
+              value="Pérez" 
+              placeholder="Tu apellido"
+              autocomplete="family-name"
+              aria-describedby="lastNameHelp"
+              disabled
+            />
+            <small id="lastNameHelp" class="error-msg" style="height:auto;"></small>
+          </div>
+        </div>
 
-            fields.forEach(f => {
-                const input = document.getElementById(f);
-                const display = document.getElementById(f + 'Display');
-                if (isEditing) {
-                    input.classList.remove('hidden');
-                    display.classList.add('hidden');
-                } else {
-                    input.classList.add('hidden');
-                    display.classList.remove('hidden');
-                }
-            });
+        <!-- Correo -->
+        <div class="row center-row">
+          <div class="input-wrap">
+            <label for="email">Correo electrónico</label>
+            <input 
+              type="email" 
+              id="email" 
+              name="email"
+              value="juan.perez@email.com" 
+              placeholder="tucorreo@ejemplo.com"
+              autocomplete="email"
+              aria-describedby="emailHelp"
+              disabled
+            />
+            <small id="emailHelp" class="error-msg" style="height:auto;"></small>
+          </div>
+        </div>
 
-            if (isEditing) {
-                editBtnText.textContent = 'Cancelar';
-                saveSection.style.display = 'block';
-                cameraBtn.classList.remove('hidden');
-            } else {
-                editBtnText.textContent = 'Editar';
-                saveSection.style.display = 'none';
-                cameraBtn.classList.add('hidden');
-            }
-        }
+        <!-- Guardar cambios -->
+        <div class="row" id="saveSection" style="display: none;">
+          <button type="button" class="btn" onclick="saveProfile()">
+            <i data-lucide="save"></i> Guardar cambios
+          </button>
+        </div>
+      </form>
 
-        function goBack() {
-            window.history.back();
-        }
+      <!-- Botón editar -->
+      <div class="row">
+        <button id="editBtn" type="button" class="btn" onclick="toggleEdit()">
+          <span id="editBtnText">Editar</span>
+        </button>
+      </div>
 
-        function handleDeleteAccount() {
-            const confirmDelete = window.confirm("⚠️ ¿Estás seguro de eliminar tu cuenta.Esta acción es permanente. Una vez eliminada, no podrás recuperar tu cuenta ni tus datos.?");
-            if (confirmDelete) {
-                console.log("Cuenta eliminada (simulación)");
-            }
-        }
-    </script>
-    <script type="module" src="/src/js/profile.js"></script>
+      <!-- Eliminar cuenta -->
+      <div class="row">
+        <div class="delete-card">
+          <button class="btn btn-danger" onclick="handleDeleteAccount()">
+            <i data-lucide="x-circle"></i> Eliminar mi cuenta
+          </button>
+        </div>
+        <!-- volver al tablero -->
+        <p class="back-to-login"><a class="back-board" href="#/board">Volver al tablero</a></p>
+      <p id="createTaskMsg"></p>
+      </div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    let isEditing = false;
+    lucide.createIcons();
+
+    function toggleEdit() {
+      isEditing = !isEditing;
+      const editBtnText = document.getElementById('editBtnText');
+      const saveSection = document.getElementById('saveSection');
+
+      // Inputs que se pueden editar
+      const fields = ['firstName', 'lastName', 'email'];
+
+      fields.forEach(id => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        // alterna disabled
+        el.disabled = !isEditing;
+      });
+
+      if (isEditing) {
+        editBtnText.textContent = 'Cancelar';
+        saveSection.style.display = 'block';
+      } else {
+        editBtnText.textContent = 'Editar';
+        saveSection.style.display = 'none';
+      }
+    }
+
+    // Simula volver
+    function goBack() { window.history.back(); }
+
+    // Simula delete
+    function handleDeleteAccount() {
+      const confirmDelete = window.confirm("⚠️ ¿Estás seguro de eliminar tu cuenta? Esta acción es permanente.");
+      if (confirmDelete) {
+        console.log("Cuenta eliminada (simulación)");
+      }
+    }
+
+    // Rellena datos visibles (si vienen de tu backend en profile.js, puedes quitar esto)
+    document.addEventListener('DOMContentLoaded', () => {
+      // Ejemplo de seteo de la fecha (para que se vea algo)
+      const createdAt = new Date().toLocaleDateString();
+      const createdDate = document.getElementById('createdDate');
+      if (createdDate) createdDate.textContent = createdAt;
+    });
+  </script>
+
+  
+  <script type="module" src="/src/js/profile.js"></script>
+
 </body>
 </html>

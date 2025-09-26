@@ -1,23 +1,24 @@
 
-<div class="login-page">
-    <div class="app-brand">
-      <img src="/logo.png" alt="Tasklistapp Logo" class="logo" />
-    </div>
+<div class="login-page" style="flex: 1 1 auto; min-height: 0;">
+  <header class="login-header header-logo-wrapper">
+    <img src="/logo.png" alt="Tasklistapp Logo" class="app-logo" />
+  </header>
+  <main class="kanban-main" style="flex: 1 1 auto; width:100%; display:flex; justify-content:center;">
   <!-- Top back link removed per design request -->
   <div class="login-card">
     <h2 style="margin-top:0">Crear tarea</h2>
 
     <form id="createTaskForm" class="form" autocomplete="off" novalidate>
       <div class="row center-row">
-        <label for="title" class="label-login"></label>
+  <label for="title" class="label-login">Título de la actividad</label>
         <div class="input-wrap">
-          <input id="title" name="title" type="text" required minlength="2" placeholder="Ej: Terminar proyecto" />
+          <input id="title" name="title" type="text" required minlength="2" placeholder="Título de la actividad" />
         </div>
         <small class="error-msg" id="titleError"></small>
       </div>
 
       <div class="row center-row">
-        <label for="description" class="label-login"></label>
+  <label for="description" class="label-login">Descripción</label>
         <div class="input-wrap">
           <textarea id="description" name="description" required minlength="2" placeholder="Describe la tarea..."></textarea>
         </div>
@@ -25,14 +26,14 @@
       </div>
 
       <div class="row center-row">
-        <label for="expectedDate" class="label-login"></label>
+  <label for="expectedDate" class="label-login">Fecha límite</label>
         <div class="input-wrap">
           <input id="expectedDate" name="expectedDate" type="date" required />
         </div>
         <small class="error-msg" id="expectedDateError"></small>
       </div>
       <div class="row center-row">
-        <label for="status" class="label-login"></label>
+        <label for="status" class="label-login">Estado de la actividad</label>
         <div class="input-wrap">
           <select id="status" name="status" required>
             <option value="Por hacer">Por hacer</option>
@@ -57,4 +58,5 @@
       <p id="createTaskMsg"></p>
     </form>
   </div>
+  </main>
 </div>

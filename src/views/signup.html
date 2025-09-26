@@ -1,4 +1,4 @@
-<div id="registerPage" class="login-page">
+<div id="registerPage" class="login-page" style="flex: 1 1 auto; min-height: 0;">
   <header class="login-header header-logo-wrapper">
     <img src="/logo.png" alt="Tasklistapp Logo" class="app-logo" />
   </header>
@@ -13,48 +13,61 @@
     <form id="registerForm" class="form" autocomplete="off" novalidate>
       <!-- Nombres y apellidos en fila compacta -->
       <div class="row row-inline">
-        <div class="input-wrap">
-          <input id="firstName" name="firstName" type="text" placeholder="Nombre" required minlength="2" />
-          <small class="error-msg" id="firstNameError"></small>
+        <div class="field">
+          <label for="firstName" class="label-login">Nombre</label>
+          <div class="input-wrap">
+            <input id="firstName" name="firstName" type="text" required minlength="2" />
+            <small class="error-msg" id="firstNameError"></small>
+          </div>
         </div>
-        <div class="input-wrap">
-          <input id="lastName" name="lastName" type="text" placeholder="Apellido" required minlength="2" />
-          <small class="error-msg" id="lastNameError"></small>
+
+        <div class="field">
+          <label for="lastName" class="label-login">Apellido</label>
+          <div class="input-wrap">
+            <input id="lastName" name="lastName" type="text" required minlength="2" />
+            <small class="error-msg" id="lastNameError"></small>
+          </div>
         </div>
       </div>
 
       <!-- Edad -->
-      <div class="row">
+      <div class="row center-row">
+        <label for="age" class="label-login">Edad</label>
         <div class="input-wrap">
-          <input id="age" name="age" type="number" placeholder="Edad" required min="13" />
+          <input id="age" name="age" type="number" required min="13" />
           <small class="error-msg" id="ageError"></small>
         </div>
       </div>
 
       <!-- Correo -->
-      <div class="row">
+      <div class="row center-row">
+        <label for="email" class="label-login">Correo electrónico</label>
         <div class="input-wrap">
-          <input id="email" name="email" type="email" placeholder="Correo electrónico" required />
+          <input id="email" name="email" type="email" required />
           <small class="error-msg" id="emailError"></small>
         </div>
       </div>
 
       <!-- Contraseña -->
-      <div class="row">
-        <div class="input-wrap">
-          <input id="password" name="password" type="password" placeholder="Contraseña" required minlength="8" />
-          <button id="togglePasswordReg" type="button" class="toggle-pass">Mostrar</button>
-          <small class="error-msg" id="passwordError"></small>
-        </div>
+      <div class="row center-row">
+        <label class="label-login">Contraseña
+          <div class="input-wrap">
+            <input id="password" name="password" type="password" required minlength="8" />
+            <button id="togglePasswordReg" type="button" class="toggle-pass">Mostrar</button>
+            <small class="error-msg" id="passwordError"></small>
+          </div>
+        </label>
       </div>
 
       <!-- Confirmar contraseña -->
-      <div class="row">
-        <div class="input-wrap">
-          <input id="confirmPassword" name="confirmPassword" type="password" placeholder="Confirmar contraseña" required minlength="8" />
-          <button id="toggleConfirmReg" type="button" class="toggle-pass">Mostrar</button>
-          <small class="error-msg" id="confirmPasswordError"></small>
-        </div>
+      <div class="row center-row">
+        <label class="label-login">Confirmar contraseña
+          <div class="input-wrap">
+            <input id="confirmPassword" name="confirmPassword" type="password" required minlength="8" />
+            <button id="toggleConfirmReg" type="button" class="toggle-pass">Mostrar</button>
+            <small class="error-msg" id="confirmPasswordError"></small>
+          </div>
+        </label>
       </div>
 
       <!-- Botón de registro -->
@@ -72,3 +85,9 @@
     </form>
   </div>
 </div>
+</div>
+
+<script type="module">
+  import { renderFooter } from '/src/components/footer.js';
+  try { renderFooter(); } catch (e) { console.warn('Could not render footer', e); }
+</script>

@@ -1,20 +1,158 @@
+/* ====== BEGIN: profile.css (el que quieres eliminar) ====== */
 :root {
-    --primary-color: #3B82F6;       /* Verde agua para botones */
-    --secondary-color: #3B82F6;     /* Verde más oscuro para hover */
-    --primary-color: #3B82F6;       /* Verde agua para botones */
-    --secondary-color: #3B82F6;     /* Verde más oscuro para hover */
-    --background-color: #121212;    /* Fondo muy oscuro */
-    --card-background: #1e1e1e;     /* Tarjeta ligeramente más clara */
-    --text-color: #ecf0f1;          /* Texto claro */
-    --border-color: #34495e;        /* Bordes elegantes */
-    --error-color: #e74c3c;         /* Rojo para errores */
-    --success-color: #3B82F6;       /* Verde para éxito */
-    --success-color: #3B82F6;       /* Verde para éxito */
-    --font-family: 'Open Sans', sans-serif;
+  --primary-color: #3B82F6; /* azul principal */
+  --background-color: #f5f5f5; /* fondo de página */
+  --card-background: #ffffff; /* tarjeta blanca */
+  --text-color: #111111; /* texto principal */
+  --input-border: #d1d5db; /* gris claro para inputs */
+  --input-focus: #3B82F6; /* azul al enfocar */
 }
 
+/* Página principal */
+#profilePage {
+  background: var(--background-color);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100vh;
+  padding: 0.35rem 0.6rem;
+  color: var(--text-color);
+margin-bottom: 0.2rem;
+}
+
+/* Header con logo */
+.login-header {
+  margin-bottom: 2rem;
+}
+.login-header .app-logo {
+  max-width: 160px;
+  height: auto;
+}
+
+/* Tarjeta del perfil */
+.login-card {
+  background: var(--card-background);
+  color: var(--text-color);
+  padding: 2rem;
+  border-radius: 1rem;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  max-width: 480px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* Títulos dentro de la tarjeta */
+.login-card h2 {
+  margin-bottom: 0.5rem;   /* antes 1.25rem */
+  margin-top: 0;
+  font-size: 1.5rem;
+  text-align: center;
+  color: #ffffff;
+}
+
+/* Inputs y filas */
+.row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.row-inline {
+  flex-direction: row;
+  gap: 1rem;
+}
+.input-wrap {
+  display: flex;
+  flex-direction: column;
+}
+.input-wrap input {
+  padding: 0.6rem 0.75rem;
+  border: 1px solid var(--input-border);
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.input-wrap input:focus {
+  border-color: var(--input-focus);
+  box-shadow: 0 0 0 2px rgba(59,130,246,0.2);
+  outline: none;
+}
+
+/* Botones */
+.btn {
+  padding: 0.75rem 1rem;
+  border: none;
+  border-radius: 0.6rem;
+  background: var(--primary-color);
+  color: #fff;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.btn:hover {
+  background: #2563eb;
+}
+
+/* Botones de mostrar contraseña */
+.toggle-pass {
+  margin-top: 0.25rem;
+  align-self: flex-end;
+  background: none;
+  border: none;
+  color: var(--primary-color);
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+
+/* Mensajes de error */
+.error-msg {
+  font-size: 0.75rem;
+  color: #dc2626; /* rojo suave */
+  height: 1rem;
+}
+
+/* Link de volver al login */
+.back-to-login {
+  text-align: center;
+  font-size: 0.9rem;
+}
+.back-to-login a {
+  color: var(--primary-color);
+  text-decoration: none;
+}
+.back-to-login a:hover {
+  text-decoration: underline;
+}
+
+/* Avatar circular */
+.avatar-circle {
+  width: 6rem;
+  height: 6rem;
+  border-radius: 50%;
+  background: var(--primary-color);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin: 0 auto 1rem;
+  user-select: none;
+}
+
+/* Responsive */
+@media (max-width: 500px) {
+  .row-inline {
+    flex-direction: column;
+  }
+}
+/* ====== END: profile.css ====== */
+
+
+/* ====== BEGIN: CSS BASE (el estilo que quieres mantener) ====== */
 body {
-    font-family: var(--font-family);
+    font-family: 'Inter', system-ui, sans-serif;
     background: linear-gradient(180deg, #f4f8ff 0%, #eef4ff 100%);
     color: var(--text-color);
     margin: 0;
@@ -66,6 +204,17 @@ html{
   padding: 2rem 1rem;
   margin-top: 0;
 }
+#registerPage .input-wrap {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+#registerPage .input-wrap input {
+    max-width: 330px;
+    width: 100%;
+    margin: 0 auto;
+}
 
 .login-card {
     width: 100%;
@@ -82,7 +231,13 @@ html{
 }
 
 .login-card h2 {
-    margin: 0 0 1.25rem 0;
+#registerPage .input-wrap .toggle-pass {
+    background: rgba(13,95,34,0.06);
+    border-radius: 6px;
+    color: #2563eb; /* ensure contrast */
+}
+    margin-bottom: 0.5rem;   /* antes 1.25rem */
+    margin-top: 0;
     font-size: 1.35rem;
     text-align: center;
     font-weight: 700;
@@ -100,6 +255,7 @@ html{
     font-size: 0.85rem;
     margin-bottom: 0.25rem;
     opacity: 0.9;
+    color: white;
 }
 
 .login-card input[type="email"],
@@ -301,6 +457,79 @@ header .logo {
 
 #registerPage .row-inline .input-wrap {
     flex: 1;
+}
+
+/* Ensure name and surname fields have the same width and centered labels */
+#registerPage .row-inline .field {
+    flex: 1 1 0%;           /* equal width children */
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+#registerPage .row-inline .field .label-login {
+    text-align: center;     /* center the label text for Nombre/Apellido */
+    width: 100%;
+    display: block;
+}
+
+/* Constrain input width so both columns align visually */
+#registerPage .row-inline .field .input-wrap {
+    width: 100%;
+}
+
+/* Make sure inputs inside register two-column row use full available width */
+#registerPage .row-inline .field .input-wrap input {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* Constrain the two-column inputs (Nombre/Apellido) to the same visual width as
+   other centered fields (match .center-row max-width) so they don't look wider. */
+/* Center the input inside the two-column fields and limit its width.
+   Use width:auto so max-width can take effect and the parent centering works. */
+#registerPage .row-inline .field .input-wrap {
+    display: flex;
+    justify-content: center; /* center the input inside the column */
+    position: relative; /* allow absolutely positioned toggle inside */
+}
+
+#registerPage .row-inline .field .input-wrap input {
+    max-width: 330px; /* same as .center-row inputs */
+    width: auto;
+    box-sizing: border-box;
+}
+
+/* Ensure register inputs leave room for the toggle "Mostrar" button */
+#registerPage .input-wrap input {
+    padding-right: 3.6rem; /* reserve space for toggle on the right */
+}
+
+/* Stronger centering rule: make the two-column inputs behave like center-row fields
+   by using width:100 with a constraining max-width and auto margins. This ensures
+   they look identical across the form even when other generic rules exist. */
+#registerPage .row-inline .field .input-wrap input {
+    width: 100%;
+    max-width: 330px;
+    margin: 0 auto; /* center inside the field */
+}
+
+/* Tweak the toggle button style on the register page so it sits inside the field
+   and is clearly visible on the white input background. Overrides earlier rules. */
+#registerPage .input-wrap .toggle-pass {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 3;
+    background: rgba(255,255,255,0.9); /* light background for contrast */
+    border: 1px solid rgba(0,0,0,0.06);
+    color: #1f2937; /* dark text for readability */
+    padding: 4px 8px;
+    font-size: 0.85rem;
+    line-height: 1;
+    border-radius: 6px;
+    box-shadow: 0 2px 6px rgba(2,6,23,0.08);
 }
 
 
@@ -580,7 +809,7 @@ h1 {
 .form label {
     margin-bottom: 5px;
     font-weight: 500;
-    color: var(--text-color);
+    color: #ffffff;
 }
 
 .form input {
@@ -655,7 +884,7 @@ h1 {
     width: 100%;
     padding: 12px 14px;
     background-color: #3B82F6;
-    color: var(--text-color);
+    color: #ffffff;
     border: none;
     border-radius: 10px;
     font-size: 1.02rem;
@@ -675,6 +904,20 @@ h1 {
     background-color: #3B82F6; /* versión más clara y transparente */
     background-color: #3B82F6; /* versión más clara y transparente */
     cursor: not-allowed;
+}
+/*Boton eliminar cuenta*/
+.btn-danger {
+  background-color: #dc2626; 
+  color: #fff;
+}
+
+.btn-danger:hover {
+  background-color: #b91c1c; 
+}
+
+.btn-danger:disabled {
+  background-color: #fca5a5; 
+  cursor: not-allowed;
 }
 
 .spinner {
@@ -1080,7 +1323,7 @@ h1 {
 
 .kanban-title {
     text-align:center;
-    color:#333;
+    color: #fff;;
     margin:0 0 0.6rem 0;
     font-size:1.05rem;
 }
@@ -1216,19 +1459,6 @@ footer.site-footer {
 }
 .footer-brand-desc { margin: 0; color: #cbd5e1; }
 
-/* Footer brand centering */
-.footer-brand {
-    display: flex;
-    flex-direction: column;
-    align-items: center; /* center logo and text horizontally */
-    justify-content: center;
-}
-
-/* On desktop keep the brand aligned to start (left) if layout requires left alignment, but center visually by default */
-@media (min-width: 768px) {
-    .site-footer .footer-grid > div:first-child { justify-self: center; }
-}
-
 /* Social section */
 .social-section { display:flex; flex-direction:column; align-items:center; gap:0.5rem; }
 .social-title { margin:0; font-size:1rem; font-weight:700; color:#e6eefc; }
@@ -1262,3 +1492,135 @@ footer.site-footer {
   font-size: 0.75rem;
   color: #94a3b8; /* slate-400 */
 }
+/* Reducir separación entre filas de formularios */
+/* ===== Formularios compactos (global) ===== */
+
+/* Filas más juntas y sin espacios extra arriba */
+.form .row {
+  margin: 0 0 0.4rem 0;     /* menos separación entre campos */
+  gap: 0.25rem;             /* reduce espacio interno cuando hay flex */
+}
+
+/* Las filas centradas también compactas */
+.form .row.center-row {
+  gap: 0.25rem;
+  margin-bottom: 0.5rem;
+}
+
+/* Label pegado al input */
+.form .input-wrap label,
+.label-login {
+  margin: 0 0 0.15rem 0;    /* casi pegado */
+  line-height: 1.2;
+  display: block;           /* asegura bloque sin colas raras */
+}
+
+/* Inputs/textarea/select más bajos */
+.form .input-wrap input,
+.form .input-wrap textarea,
+.form .input-wrap select,
+.form input,
+.form textarea,
+.form select {
+  padding: 0.38rem 0.6rem;  /* reduce alto */
+  font-size: 0.95rem;       /* un pelín más compacto */
+  line-height: 1.25;
+}
+
+/* Textarea sin exceso de altura inicial */
+.form .input-wrap textarea {
+  min-height: 96px;         /* antes era muy alto en algunos casos */
+}
+
+/* Mensajes de error sin “empujar” el layout */
+.form .error-msg {
+  margin-top: 0.2rem;
+  min-height: 0.9rem;       /* reserva poco espacio para evitar saltos */
+  line-height: 1.1;
+}
+
+/* La tarjeta no añade relleno extra entre filas */
+.login-card .row {
+  margin-top: 0;            /* por si alguna regla anterior lo subía */
+}
+
+/* Título sin separación superior adicional (ya lo tenías inline, reforzamos) */
+.login-card h2 {
+  margin-top: 0 !important;
+}
+/* === Desktop (por defecto): fijo y centrado abajo === */
+.create-task-btn {
+    /* Non-floating CTA button inside the white CTA row under the board */
+    position: relative; /* part of the document flow inside .board-cta */
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 1.05rem;
+    color: #ffffff; /* white text on filled green */
+    background: #6EA61B; /* fill color as requested */
+    padding: 0.9rem 1.6rem;
+    width: min(760px, 92%);
+    border-radius: 10px;
+    border: none;
+    box-shadow: 0 8px 24px rgba(13,95,34,0.12);
+    transition: transform .12s ease, box-shadow .12s ease, background .12s ease;
+}
+
+
+
+/* === Solo móviles/tablets: normal (se mueve con scroll) === */
+@media (max-width: 768px) {
+    /* On small screens the CTA expands to almost full width inside the CTA row */
+    .create-task-btn {
+        position: relative;
+        width: calc(100% - 32px);
+        padding: 0.7rem 1rem;
+        min-width: auto;
+        height: auto;
+        border-radius: 8px;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+    }
+}
+
+/* Icon and text inside button */
+.create-task-btn .btn-icon {
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    width:20px;
+    height:20px;
+}
+.create-task-btn .btn-text { display:inline-block; flex: 1 1 auto; text-align: center; }
+
+/* CTA row under the board */
+.board-cta-row {
+    background: #ffffff; /* white area */
+    padding: 28px 0 40px 0; /* vertical spacing */
+    margin-top: 18px;
+}
+.board-cta {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: center; /* center the CTA button */
+    align-items: center;
+}
+
+/* removed #kanbanBoard relative positioning since button is fixed */
+
+/* Standard app messages used across views */
+.app-message {
+    padding: 0.6rem 0.9rem;
+    border-radius: 8px;
+    margin: 0.6rem 0;
+    font-weight: 600;
+    line-height: 1.2;
+    box-shadow: 0 6px 18px rgba(2,6,23,0.06);
+}
+.app-message--success { background: rgba(154,168,44,0.08); color: var(--success-color); border: 1px solid rgba(155,168,44,0.18); }
+.app-message--error { background: rgba(255,77,79,0.06); color: var(--error-color); border: 1px solid rgba(255,77,79,0.12); }
+.app-message--info { background: transparent; color: inherit; border: none; }
+

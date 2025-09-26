@@ -278,7 +278,7 @@ async function initBoard() {
       li.dataset.status = uiStatus;
       li.innerHTML = `
         <div class="content">
-          <strong>Titulo: ${escapeHtml(task.title || '(sin título)')}</strong>
+          <strong>Título: ${escapeHtml(task.title || '(sin título)')}</strong>
           <div>Descripción: ${escapeHtml(task.description || '')}</div>
           ${ dueLabel ? `<div class="task-due">${dueLabel}</div>` : '' }
   </div>
